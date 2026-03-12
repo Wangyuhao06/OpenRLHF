@@ -1,0 +1,46 @@
+# Data Configuration
+
+# WebShop trajectory paths
+webshop:
+  trajectory_dir: "/home/yuhao/code/WebShop_VanillaReactAgent_TrajectoryGeneration/logs/raw/webshop/react_v1"
+  trajectory_files:
+    - "20260309_221152_baseline.jsonl"
+    - "20260309_224140_baseline.jsonl"
+    - "20260309_233434_baseline.jsonl"
+    - "2026-03-06_baseline.jsonl"
+    - "2026-03-09_baseline.jsonl"
+
+  # Filtering
+  use_only_successful: true
+  min_steps: 2
+  max_steps: 50
+
+# Data splits
+splits:
+  train_ratio: 0.7
+  val_ratio: 0.15
+  test_ratio: 0.15
+  shuffle_seed: 42
+
+# Processed data paths
+processed_data_dir: "./data/webshop/processed"
+sft_data_dir: "./data/webshop/processed/sft"
+bestofn_data_dir: "./data/webshop/processed/bestofn"
+rl_data_dir: "./data/webshop/processed/rl"
+
+# Hindsight labeling
+hindsight:
+  method: "llm_judge"  # "llm_judge", "retrieval_heuristic", "counterfactual"
+  llm_judge_model: "gpt-5"
+  contribution_threshold: 0.3
+  max_history_length: 5
+
+# Data preprocessing
+preprocessing:
+  max_observation_length: 2048
+  max_history_items: 3
+  tokenizer: "Qwen/Qwen2.5-9B"
+
+# Caching
+cache_dir: "./data/cache"
+use_cache: true

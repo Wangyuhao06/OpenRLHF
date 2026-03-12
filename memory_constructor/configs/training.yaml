@@ -1,0 +1,90 @@
+# Training Configuration
+
+# SFT Training
+sft:
+  train_batch_size: 128
+  micro_train_batch_size: 4  # Per GPU
+  learning_rate: 1.0e-5
+  max_epochs: 3
+  warmup_steps: 100
+  weight_decay: 0.01
+  gradient_accumulation_steps: 4
+  max_grad_norm: 1.0
+
+  # Scheduler
+  scheduler_type: "cosine"
+
+  # Logging
+  logging_steps: 10
+  eval_steps: 100
+  save_steps: 500
+
+  # DeepSpeed
+  zero_stage: 2
+  bf16: true
+  gradient_checkpointing: true
+
+# Best-of-N Training
+bestofn:
+  num_candidates: 4
+  sampling_temperature: 0.9
+  sampling_top_p: 0.9
+
+  # Scoring weights
+  hindsight_weight: 0.5
+  counterfactual_weight: 0.5
+
+  # Combined score weights
+  retrieval_usefulness_weight: 0.4
+  task_success_weight: 0.3
+  compactness_weight: 0.1
+  redundancy_weight: 0.1
+  faithfulness_weight: 0.1
+
+  # Training (same as SFT)
+  train_batch_size: 128
+  micro_train_batch_size: 4
+  learning_rate: 5.0e-6  # Lower than SFT
+  max_epochs: 2
+  warmup_steps: 50
+
+# RL Training
+rl:
+  # PPO settings
+  train_batch_size: 128
+  micro_train_batch_size: 2
+  learning_rate: 1.0e-6
+  max_epochs: 5
+
+  # PPO hyperparameters
+  init_kl_coef: 0.01
+  advantage_estimator: "ppo"
+  gamma: 0.99
+  lam: 0.95
+  clip_range: 0.2
+  value_clip_range: 0.2
+
+  # Reward weights
+  retrieval_hit_weight: 0.1
+  write_cost_penalty: 0.05
+  compactness_weight: 0.02
+  distillation_weight: 0.1
+
+  # Generation
+  n_samples_per_prompt: 1
+  prompt_max_len: 1024
+  generate_max_len: 512
+
+  # Ray settings
+  actor_num_nodes: 1
+  actor_num_gpus_per_node: 4
+  vllm_num_engines: 2
+  vllm_tensor_parallel_size: 2
+
+# General
+seed: 42
+output_dir: "./outputs"
+checkpoint_dir: "./checkpoints"
+log_dir: "./logs"
+wandb_project: "memory-constructor"
+wandb_run_name: null  # Auto-generated if null

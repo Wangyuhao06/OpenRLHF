@@ -1,0 +1,39 @@
+# Model Configuration
+
+# Base model
+base_model: "Qwen/Qwen2.5-9B"
+model_type: "actor"
+
+# Model parameters
+param_dtype: "bf16"
+attn_implementation: "flash_attention_2"
+
+# LoRA settings (set lora_rank=0 for full fine-tuning)
+lora_rank: 0
+lora_alpha: 16
+lora_dropout: 0.05
+target_modules: ["q_proj", "v_proj", "k_proj", "o_proj"]
+
+# Memory constraints
+max_value_tokens: 256  # Start small (128-512 range)
+max_key_tokens: 64
+max_num_keys: 4
+episode_memory_budget: 20
+
+# Generation settings
+max_output_tokens: 512
+temperature: 0.7
+top_p: 0.9
+do_sample: true
+
+# Retrieval settings
+retrieval_method: "hybrid"  # "bm25", "dense", or "hybrid"
+retrieval_k: 3
+bm25_weight: 0.5
+dense_weight: 0.5
+dense_model: "sentence-transformers/all-MiniLM-L6-v2"
+
+# Agent settings
+agent_type: "gpt5"
+agent_model: "gpt-5"
+agent_temperature: 0.7
