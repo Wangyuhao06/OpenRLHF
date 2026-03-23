@@ -1,0 +1,46 @@
+{
+  "base_model": {
+    "model_name": "Base Model",
+    "model_path": "Qwen/Qwen2.5-0.5B-Instruct",
+    "num_samples": 100,
+    "write_metrics": {
+      "accuracy": 0.43,
+      "precision": 0.42528735632183906,
+      "recall": 0.8409090909090909,
+      "f1": 0.564885496183206,
+      "tp": 37,
+      "fp": 50,
+      "tn": 6,
+      "fn": 7,
+      "total": 100,
+      "write_rate_pred": 0.87,
+      "write_rate_gt": 0.44
+    },
+    "key_similarity": {
+      "avg_key_jaccard": 0.05463320463320463,
+      "num_both_write": 37
+    }
+  },
+  "trained_model": {
+    "model_name": "Trained Model",
+    "model_path": "checkpoints/sft_demand_aware_0.5b/final",
+    "num_samples": 100,
+    "write_metrics": {
+      "accuracy": 0.56,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "tp": 0,
+      "fp": 0,
+      "tn": 56,
+      "fn": 44,
+      "total": 100,
+      "write_rate_pred": 0.0,
+      "write_rate_gt": 0.44
+    },
+    "key_similarity": {
+      "avg_key_jaccard": 0.0,
+      "num_both_write": 0
+    }
+  }
+}

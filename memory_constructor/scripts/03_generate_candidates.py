@@ -16,11 +16,9 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from memory_constructor.training.candidate_sampler import CandidateSampler
+from memory_constructor.utils.logging_utils import LOG_FORMAT, setup_file_logging
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
+logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 logger = logging.getLogger(__name__)
 
 
@@ -106,6 +104,8 @@ def parse_args():
 def main():
     """Main candidate generation pipeline."""
     args = parse_args()
+
+    setup_file_logging("generate_candidates", project_root)
 
     logger.info("=" * 80)
     logger.info("Candidate Generation for Best-of-N Training")

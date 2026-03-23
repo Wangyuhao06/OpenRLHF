@@ -278,7 +278,7 @@ class MetricsCalculator:
         words1 = set(mem1.get("value", "").lower().split())
         words2 = set(mem2.get("value", "").lower().split())
 
-        if len(words1 & words2) / max(len(words1), len(words2)) > 0.7:
+        if max(len(words1), len(words2)) > 0 and len(words1 & words2) / max(len(words1), len(words2)) > 0.7:
             return True
 
         return False

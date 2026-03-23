@@ -29,6 +29,8 @@ class BaseDistributedActor:
         os.environ["MASTER_PORT"] = str(self._master_port)
         os.environ["WORLD_SIZE"] = str(self._world_size)
         os.environ["RANK"] = str(self._rank)
+        # Fix NCCL shared memory issue in Docker containers with small /dev/shm
+        os.environ.setdefault("NCCL_SHM_DISABLE", "1")
         # NOTE: Ray will automatically set the *_VISIBLE_DEVICES
         # environment variable for each actor, unless
         # RAY_EXPERIMENTAL_NOSET_*_VISIBLE_DEVICES is set, so

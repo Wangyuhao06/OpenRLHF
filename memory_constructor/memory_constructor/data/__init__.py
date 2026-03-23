@@ -14,7 +14,7 @@ from .schemas import (
 )
 from .memory_store import MemoryStore
 from .webshop_parser import WebShopParser
-from .hindsight_labeling import HindsightLabeler, HeuristicLabeler
+from .hindsight_labeling import HindsightLabeler, HeuristicLabeler, DemandAwareHindsightLabeler
 
 __all__ = [
     # Schemas
@@ -35,4 +35,5 @@ __all__ = [
     # Labeling
     "HindsightLabeler",
     "HeuristicLabeler",
+    "DemandAwareHindsightLabeler",
 ]

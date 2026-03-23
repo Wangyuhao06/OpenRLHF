@@ -1,5 +1,9 @@
 import argparse
+import os
 from datetime import datetime
+
+# Fix NCCL shared memory issue in Docker containers with small /dev/shm
+os.environ.setdefault("NCCL_SHM_DISABLE", "1")
 
 import ray
 from ray.util.placement_group import placement_group
@@ -18,7 +22,7 @@ from openrlhf.utils import get_strategy
 def train(args):
     # initialize ray if not initialized
     if not ray.is_initialized():
-        ray.init(runtime_env={"env_vars": {"TOKENIZERS_PARALLELISM": "true", "NCCL_DEBUG": "WARN"}})
+        ray.init(runtime_env={"env_vars": {"TOKENIZERS_PARALLELISM": "true", "NCCL_DEBUG": "WARN", "NCCL_SHM_DISABLE": "1"}})
 
     # configure strategy
     strategy = get_strategy(args)
@@ -151,6 +155,7 @@ def train(args):
         max_length=args.max_len,
         temperature=args.temperature,
         top_p=args.top_p,
+        repetition_penalty=args.repetition_penalty,
     )
 
     # training update steps
@@ -354,6 +359,7 @@ if __name__ == "__main__":
     parser.add_argument("--normalize_reward", action="store_true", default=False, help="Enable Reward Normalization")
     parser.add_argument("--top_p", type=float, default=1.0)
     parser.add_argument("--temperature", type=float, default=1.0)
+    parser.add_argument("--repetition_penalty", type=float, default=1.0)
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument(
         "--full_determinism",

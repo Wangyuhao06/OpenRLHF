@@ -1,177 +1,189 @@
 #!/usr/bin/env python3
 """
-Script 07: Train memory constructor with RL (PPO).
+Script 07: Train memory constructor with RL (REINFORCE baseline).
 
-This script trains the memory constructor using Proximal Policy Optimization (PPO)
-with online rollouts in the WebShop environment.
+Launches OpenRLHF's PPO/REINFORCE training with the memory constructor
+AgentInstance. Requires:
+  1. WebShop pool server running (see interaction_env/.../scripts/)
+  2. Frozen agent vLLM server running (Qwen3-8B on separate machine)
+  3. Ray cluster started
+
+Usage:
+    # Set environment variables first:
+    export WEBSHOP_SERVER_URL="http://localhost:6001"
+    export FROZEN_AGENT_URL="http://<separate-machine>:8000/v1"
+    export FROZEN_AGENT_MODEL="Qwen/Qwen3-8B"
+
+    # Run via Ray:
+    ray job submit --address="http://127.0.0.1:8265" -- \\
+        python memory_constructor/scripts/07_train_rl.py
+
+    # Or directly:
+    python memory_constructor/scripts/07_train_rl.py
 """
 
 import argparse
-import logging
+import os
+import subprocess
 import sys
 from pathlib import Path
-import yaml
 
-# Add project root to path
-project_root = Path(__file__).parent.parent
-sys.path.insert(0, str(project_root))
-
-from openrlhf.cli.train_ppo_ray import train as train_ppo_ray
-
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
-logger = logging.getLogger(__name__)
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent  # OpenRLHF root
+MC_ROOT = Path(__file__).resolve().parent.parent  # memory_constructor root
+AGENT_FUNC_PATH = MC_ROOT / "scripts" / "agent_func_memory_constructor.py"
+DEFAULT_PRETRAIN = MC_ROOT / "checkpoints" / "sft_qwen3_8b_v2" / "checkpoints" / "global_step280_hf"
+DEFAULT_PROMPT_DATA = MC_ROOT / "data" / "webshop" / "rl_prompts.jsonl"
+DEFAULT_SAVE_PATH = MC_ROOT / "checkpoints" / "rl_qwen3_8b"
 
 
 def parse_args():
-    """Parse command line arguments."""
-    parser = argparse.ArgumentParser(
-        description="Train memory constructor with RL (PPO)"
-    )
+    parser = argparse.ArgumentParser(description="Train memory constructor with RL")
 
-    # Config files
-    parser.add_argument(
-        "--model_config",
-        type=str,
-        default="configs/model.yaml",
-        help="Path to model config file",
-    )
-    parser.add_argument(
-        "--training_config",
-        type=str,
-        default="configs/training.yaml",
-        help="Path to training config file",
-    )
+    # Model & data
+    parser.add_argument("--pretrain", type=str, default=str(DEFAULT_PRETRAIN))
+    parser.add_argument("--prompt_data", type=str, default=str(DEFAULT_PROMPT_DATA))
+    parser.add_argument("--save_path", type=str, default=str(DEFAULT_SAVE_PATH))
 
-    # Model paths
-    parser.add_argument(
-        "--actor_model",
-        type=str,
-        required=True,
-        help="Path to SFT-trained actor model checkpoint",
-    )
-    parser.add_argument(
-        "--critic_model",
-        type=str,
-        default=None,
-        help="Path to critic model (if None, use actor model)",
-    )
-    parser.add_argument(
-        "--reward_model",
-        type=str,
-        default=None,
-        help="Path to reward model (optional, for learned rewards)",
-    )
+    # RL hyperparameters
+    parser.add_argument("--advantage_estimator", type=str, default="reinforce_baseline")
+    parser.add_argument("--n_samples_per_prompt", type=int, default=4)
+    parser.add_argument("--rollout_batch_size", type=int, default=16)
+    parser.add_argument("--train_batch_size", type=int, default=64)
+    parser.add_argument("--micro_train_batch_size", type=int, default=1)
+    parser.add_argument("--micro_rollout_batch_size", type=int, default=1)
+    parser.add_argument("--prompt_max_len", type=int, default=2048)
+    parser.add_argument("--generate_max_len", type=int, default=8192)
+    parser.add_argument("--max_samples", type=int, default=4000)
+    parser.add_argument("--max_epochs", type=int, default=1)
+    parser.add_argument("--num_episodes", type=int, default=3)
+    parser.add_argument("--actor_learning_rate", type=float, default=1e-7)
+    parser.add_argument("--repetition_penalty", type=float, default=1.2)
 
-    # Environment
-    parser.add_argument(
-        "--env_type",
-        type=str,
-        default="webshop",
-        choices=["webshop", "alfworld"],
-        help="Environment type",
-    )
-    parser.add_argument(
-        "--num_episodes",
-        type=int,
-        default=1000,
-        help="Number of episodes to collect",
-    )
-
-    # Output
-    parser.add_argument(
-        "--output_dir",
-        type=str,
-        default="checkpoints/rl",
-        help="Output directory for checkpoints",
-    )
-    parser.add_argument(
-        "--save_steps",
-        type=int,
-        default=100,
-        help="Save checkpoint every N steps",
-    )
-
-    # Training hyperparameters (override config)
-    parser.add_argument("--learning_rate", type=float, default=None)
-    parser.add_argument("--num_epochs", type=int, default=None)
-    parser.add_argument("--rollout_batch_size", type=int, default=None)
-
-    # Ray/vLLM settings
-    parser.add_argument("--num_nodes", type=int, default=1)
-    parser.add_argument("--num_gpus_per_node", type=int, default=4)
-    parser.add_argument("--vllm_num_engines", type=int, default=2)
+    # GPU layout
+    parser.add_argument("--actor_num_gpus", type=int, default=6)
+    parser.add_argument("--ref_num_gpus", type=int, default=6)
+    parser.add_argument("--vllm_num_engines", type=int, default=3)
     parser.add_argument("--vllm_tensor_parallel_size", type=int, default=2)
+    parser.add_argument("--vllm_gpu_memory_utilization", type=float, default=0.5)
+
+    # ZeRO stage (3 needed for 8B full-param training on 32GB GPUs with long sequences)
+    parser.add_argument("--zero_stage", type=int, default=3)
+
+    # Checkpointing
+    parser.add_argument("--save_steps", type=int, default=20)
+    parser.add_argument("--max_ckpt_num", type=int, default=5)
 
     # Logging
-    parser.add_argument("--wandb_project", type=str, default="memory-constructor-rl")
-    parser.add_argument("--wandb_run_name", type=str, default=None)
+    parser.add_argument("--tensorboard_dir", type=str, default=None)
 
     return parser.parse_args()
 
 
-def load_config(config_path: str) -> dict:
-    """Load YAML config file."""
-    with open(config_path, "r") as f:
-        config = yaml.safe_load(f)
-    return config
-
-
 def main():
-    """Main training function."""
     args = parse_args()
 
-    logger.info("="*80)
-    logger.info("Memory Constructor RL Training (PPO)")
-    logger.info("="*80)
+    # Validate prerequisites
+    if not Path(args.pretrain).exists():
+        print(f"ERROR: Pretrain model not found: {args.pretrain}")
+        sys.exit(1)
+    if not AGENT_FUNC_PATH.exists():
+        print(f"ERROR: Agent func not found: {AGENT_FUNC_PATH}")
+        sys.exit(1)
+    if not Path(args.prompt_data).exists():
+        print(f"ERROR: Prompt data not found: {args.prompt_data}")
+        print("Run 07a_prepare_rl_prompts.py first.")
+        sys.exit(1)
 
-    # Load configs
-    model_config = load_config(args.model_config)
-    training_config = load_config(args.training_config)
-    rl_config = training_config.get("rl", {})
+    # Check env vars
+    for var in ["WEBSHOP_SERVER_URL", "FROZEN_AGENT_URL"]:
+        if var not in os.environ:
+            print(f"WARNING: {var} not set, using default.")
 
-    # Override with command line args
-    if args.learning_rate:
-        rl_config["learning_rate"] = args.learning_rate
-    if args.num_epochs:
-        rl_config["max_epochs"] = args.num_epochs
-    if args.rollout_batch_size:
-        rl_config["train_batch_size"] = args.rollout_batch_size
+    tensorboard_dir = args.tensorboard_dir or str(
+        MC_ROOT / "results" / "rl_runs"
+    )
+    ckpt_path = str(Path(args.save_path) / "ckpt")
 
-    logger.info(f"\n[Configuration]")
-    logger.info(f"Actor model: {args.actor_model}")
-    logger.info(f"Critic model: {args.critic_model or 'Same as actor'}")
-    logger.info(f"Environment: {args.env_type}")
-    logger.info(f"Episodes: {args.num_episodes}")
-    logger.info(f"Output: {args.output_dir}")
+    cmd = [
+        sys.executable, "-m", "openrlhf.cli.train_ppo_ray",
+        # Model
+        "--pretrain", args.pretrain,
+        "--load_checkpoint",
+        "--save_path", args.save_path,
+        "--ckpt_path", ckpt_path,
+        "--save_hf_ckpt",
+        "--max_ckpt_num", str(args.max_ckpt_num),
+        "--save_steps", str(args.save_steps),
+        # Agent function
+        "--agent_func_path", str(AGENT_FUNC_PATH),
+        # Data
+        "--prompt_data", args.prompt_data,
+        "--input_key", "prompt",
+        "--label_key", "label",
+        "--prompt_max_len", str(args.prompt_max_len),
+        "--generate_max_len", str(args.generate_max_len),
+        # NOTE: --packing_samples removed — causes NaN in bf16 log_softmax on long packed sequences
+        # RL config
+        "--advantage_estimator", args.advantage_estimator,
+        "--n_samples_per_prompt", str(args.n_samples_per_prompt),
+        "--rollout_batch_size", str(args.rollout_batch_size),
+        "--train_batch_size", str(args.train_batch_size),
+        "--micro_train_batch_size", str(args.micro_train_batch_size),
+        "--micro_rollout_batch_size", str(args.micro_rollout_batch_size),
+        "--max_samples", str(args.max_samples),
+        "--max_epochs", str(args.max_epochs),
+        "--num_episodes", str(args.num_episodes),
+        # Engine
+        "--async_train",
+        "--actor_num_nodes", "1",
+        "--actor_num_gpus_per_node", str(args.actor_num_gpus),
+        "--ref_num_nodes", "1",
+        "--ref_num_gpus_per_node", str(args.ref_num_gpus),
+        "--vllm_num_engines", str(args.vllm_num_engines),
+        "--vllm_tensor_parallel_size", str(args.vllm_tensor_parallel_size),
+        "--vllm_gpu_memory_utilization", str(args.vllm_gpu_memory_utilization),
+        "--colocate_all_models",
+        "--deepspeed_enable_sleep",
+        "--vllm_sync_backend", "nccl",
+        "--enforce_eager",
+        # Training config — ZeRO-3 partitions params+grads across GPUs, enabling full-param training
+        "--zero_stage", str(args.zero_stage),
+        "--adam_offload",
+        "--gradient_checkpointing",
+        "--param_dtype", "bf16",
+        "--ref_reward_offload",
+        "--init_kl_coef", "0",
+        "--actor_learning_rate", str(args.actor_learning_rate),
+        "--no_advantage_std_norm",
+        "--train_max_tokens_per_gpu", "8192",
+        "--repetition_penalty", str(args.repetition_penalty),
+        # Logging
+        "--use_tensorboard", tensorboard_dir,
+        "--logging_steps", "1",
+        "--eval_steps", "-1",
+    ]
 
-    # Prepare OpenRLHF PPO arguments
-    # Note: This is a simplified version. Full implementation would need
-    # to integrate with OpenRLHF's Ray-based PPO trainer
-    
-    logger.info("\n" + "="*80)
-    logger.info("Starting RL training...")
-    logger.info("="*80)
+    print("=" * 80)
+    print("Memory Constructor RL Training")
+    print("=" * 80)
+    print(f"Pretrain:      {args.pretrain}")
+    print(f"Agent func:    {AGENT_FUNC_PATH}")
+    print(f"Prompt data:   {args.prompt_data}")
+    print(f"Save path:     {args.save_path}")
+    print(f"WebShop URL:   {os.environ.get('WEBSHOP_SERVER_URL', '(default)')}")
+    print(f"Frozen agent:  {os.environ.get('FROZEN_AGENT_URL', '(default)')}")
+    print(f"Frozen model:  {os.environ.get('FROZEN_AGENT_MODEL', '(default)')}")
+    print(f"Advantage:     {args.advantage_estimator}")
+    print(f"ZeRO stage:    {args.zero_stage}")
+    print(f"Batch sizes:   rollout={args.rollout_batch_size}, train={args.train_batch_size}")
+    print(f"GPU layout:    actor={args.actor_num_gpus}, ref={args.ref_num_gpus}, "
+          f"vllm={args.vllm_num_engines}xTP{args.vllm_tensor_parallel_size}")
+    print("=" * 80)
+    print(f"\nCommand:\n{' '.join(cmd)}\n")
 
-    # TODO: Implement full RL training loop
-    # This would involve:
-    # 1. Initialize Ray cluster
-    # 2. Load actor, critic, and reward models
-    # 3. Create WebShop environment wrapper
-    # 4. Run PPO training with online rollouts
-    # 5. Save checkpoints periodically
-    
-    logger.warning("\n⚠️  Full RL training not yet implemented!")
-    logger.info("\nTo implement RL training, you need to:")
-    logger.info("1. Create WebShop environment wrapper compatible with OpenRLHF")
-    logger.info("2. Implement reward function (retrieval hits, task success, etc.)")
-    logger.info("3. Set up Ray cluster for distributed training")
-    logger.info("4. Use OpenRLHF's PPO trainer with custom environment")
-    
-    logger.info("\nFor now, you can use the Best-of-N training (script 05) as an")
-    logger.info("alternative that doesn't require online environment interaction.")
+    # Execute
+    result = subprocess.run(cmd, cwd=str(PROJECT_ROOT))
+    sys.exit(result.returncode)
 
 
 if __name__ == "__main__":

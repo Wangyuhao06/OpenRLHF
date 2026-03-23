@@ -172,8 +172,16 @@ class Actor(nn.Module):
             position_ids.masked_fill_(attention_mask == 0, 1)
 
         output = self.model(sequences, attention_mask=foward_attention_mask, position_ids=position_ids)
-        # https://github.com/OpenRLHF/OpenRLHF/pull/634
-        output["logits"] = output["logits"].to(torch.float32)
+
+        # For long sequences, avoid materializing full float32 logits (OOM on large vocab models).
+        # Instead, compute log probs in chunks along the sequence dimension.
+        _logits_seqlen = output["logits"].shape[1]
+        _CHUNK_THRESHOLD = 4096  # Only chunk for sequences longer than this
+        _use_chunked = _logits_seqlen > _CHUNK_THRESHOLD and not return_entropy
+
+        if not _use_chunked:
+            # https://github.com/OpenRLHF/OpenRLHF/pull/634
+            output["logits"] = output["logits"].to(torch.float32)
 
         if return_entropy:
             assert return_output
@@ -191,7 +199,22 @@ class Actor(nn.Module):
                 )
             return output
 
-        log_probs = log_probs_from_logits(output["logits"], rolled_sequences, temperature=self.temperature)
+        if _use_chunked:
+            # Chunked log prob computation: cast each chunk to float32 individually
+            _chunk_size = 2048
+            _log_probs_chunks = []
+            _bf16_logits = output["logits"]
+            for _ci in range(0, _logits_seqlen, _chunk_size):
+                _ce = min(_ci + _chunk_size, _logits_seqlen)
+                _chunk_logits = _bf16_logits[:, _ci:_ce, :].to(torch.float32)
+                _chunk_labels = rolled_sequences[:, _ci:_ce]
+                _chunk_lp = log_probs_from_logits(_chunk_logits, _chunk_labels, temperature=self.temperature)
+                _log_probs_chunks.append(_chunk_lp)
+                del _chunk_logits
+            log_probs = torch.cat(_log_probs_chunks, dim=1)
+            del _bf16_logits
+        else:
+            log_probs = log_probs_from_logits(output["logits"], rolled_sequences, temperature=self.temperature)
 
         if self.packing_samples:
             log_probs = gather_and_pad_tensor(log_probs, ring_attn_group, ring_attn_pad_len, indices, batch, seqlen)

@@ -113,6 +113,31 @@ class SFTSample:
     contribution_score: float
     metadata: Dict[str, Any] = field(default_factory=dict)
 
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "SFTSample":
+        """Create from dict."""
+        memory_store = [
+            MemoryItem.from_dict(m) if isinstance(m, dict) else m
+            for m in data.get("memory_store", [])
+        ]
+        target_data = data.get("target_memory", {})
+        target_memory = MemoryItem.from_dict(target_data) if isinstance(target_data, dict) else target_data
+        return cls(
+            sample_id=data["sample_id"],
+            trajectory_id=data["trajectory_id"],
+            step_id=data["step_id"],
+            observation=data.get("observation", ""),
+            local_history=data.get("local_history", []),
+            memory_store=memory_store,
+            budget_remaining=data.get("budget_remaining", 20),
+            episode_progress=data.get("episode_progress", 0.0),
+            target_memory=target_memory,
+            future_task=data.get("future_task", ""),
+            hindsight_label=data.get("hindsight_label", ""),
+            contribution_score=data.get("contribution_score", 0.0),
+            metadata=data.get("metadata", {}),
+        )
+
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dict."""
         data = asdict(self)
@@ -181,6 +206,49 @@ class CandidateMemoryList:
         data["memory_store"] = [m.to_dict() if isinstance(m, MemoryItem) else m for m in self.memory_store]
         data["candidates"] = [c.to_dict() if isinstance(c, CandidateMemory) else c for c in self.candidates]
         return data
+
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> "CandidateMemoryList":
+        """Create from dict."""
+        memory_store = [
+            MemoryItem.from_dict(m) if isinstance(m, dict) else m
+            for m in data.get("memory_store", [])
+        ]
+        candidates = []
+        for c in data.get("candidates", []):
+            if isinstance(c, dict):
+                mem = c.get("memory_item", {})
+                candidates.append(CandidateMemory(
+                    candidate_id=c["candidate_id"],
+                    memory_item=MemoryItem.from_dict(mem) if isinstance(mem, dict) else mem,
+                    hindsight_score=c.get("hindsight_score", 0.0),
+                    counterfactual_score=c.get("counterfactual_score", 0.0),
+                    task_success_score=c.get("task_success_score", 0.0),
+                    retrieval_usefulness=c.get("retrieval_usefulness", 0.0),
+                    compactness_score=c.get("compactness_score", 0.0),
+                    redundancy_score=c.get("redundancy_score", 0.0),
+                    faithfulness_score=c.get("faithfulness_score", 0.0),
+                    total_score=c.get("total_score", 0.0),
+                    future_retrieval_hits=c.get("future_retrieval_hits", 0),
+                    future_impact_steps=c.get("future_impact_steps", []),
+                    sampled_perspectives=c.get("sampled_perspectives", []),
+                ))
+            else:
+                candidates.append(c)
+        return cls(
+            sample_id=data["sample_id"],
+            trajectory_id=data["trajectory_id"],
+            step_id=data["step_id"],
+            observation=data.get("observation", ""),
+            local_history=data.get("local_history", []),
+            memory_store=memory_store,
+            budget_remaining=data.get("budget_remaining", 20),
+            episode_progress=data.get("episode_progress", 0.0),
+            candidates=candidates,
+            best_candidate_idx=data.get("best_candidate_idx", -1),
+            selection_method=data.get("selection_method", ""),
+            metadata=data.get("metadata", {}),
+        )
 
 
 @dataclass

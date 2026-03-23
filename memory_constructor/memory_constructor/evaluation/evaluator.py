@@ -123,10 +123,20 @@ class Evaluator:
 
             # Update memory store
             if constructor_action["write"]:
+                raw_keys = constructor_action["keys"]
+                flat_keys = []
+                for k in raw_keys:
+                    if isinstance(k, list):
+                        flat_keys.extend(str(x) for x in k)
+                    else:
+                        flat_keys.append(str(k))
                 memory_item = {
-                    "keys": constructor_action["keys"],
-                    "value": constructor_action["value"],
-                    "step": step_idx,
+                    "write": True,
+                    "keys": flat_keys,
+                    "value": str(constructor_action["value"]),
+                    "timestamp": float(step_idx),
+                    "step_id": step_idx,
+                    "metadata": {},
                 }
                 memory_store.add(memory_item)
                 memories_written.append(memory_item)
@@ -237,8 +247,18 @@ class Evaluator:
         if memory_store.memories:
             prompt += "Current memories:\n"
             for mem in memory_store.memories[-5:]:
-                keys_str = ", ".join(mem["keys"])
-                prompt += f"- [{keys_str}]: {mem['value']}\n"
+                from memory_constructor.data.schemas import MemoryItem as _MI
+                raw_keys = mem.keys if isinstance(mem, _MI) else mem["keys"]
+                # Flatten any nested lists and convert to str
+                flat_keys = []
+                for k in raw_keys:
+                    if isinstance(k, list):
+                        flat_keys.extend(str(x) for x in k)
+                    else:
+                        flat_keys.append(str(k))
+                keys_str = ", ".join(flat_keys)
+                mem_value = mem.value if isinstance(mem, _MI) else mem["value"]
+                prompt += f"- [{keys_str}]: {mem_value}\n"
             prompt += "\n"
 
         # Instruction
@@ -263,11 +283,33 @@ class Evaluator:
         Returns:
             EvaluationMetrics object
         """
-        # Load episodes
-        episodes = []
+        # Load data — support both flat SFTSample JSONL and pre-grouped episode dicts
+        raw_records = []
         with open(data_path, "r") as f:
             for line in f:
-                episodes.append(json.loads(line))
+                line = line.strip()
+                if line:
+                    raw_records.append(json.loads(line))
+
+        # If records are flat SFTSample format (have trajectory_id but no trajectory key),
+        # group them into episode dicts keyed by trajectory_id
+        if raw_records and "trajectory_id" in raw_records[0] and "trajectory" not in raw_records[0]:
+            traj_map: Dict[str, List[Any]] = {}
+            for rec in raw_records:
+                tid = rec["trajectory_id"]
+                if tid not in traj_map:
+                    traj_map[tid] = []
+                traj_map[tid].append(rec)
+            episodes = []
+            for tid, steps in traj_map.items():
+                steps.sort(key=lambda s: s.get("step_id", 0))
+                episodes.append({
+                    "trajectory_id": tid,
+                    "trajectory": steps,
+                    "metadata": steps[0].get("metadata", {}),
+                })
+        else:
+            episodes = raw_records
 
         return self.evaluate_episodes(episodes, max_episodes)
 

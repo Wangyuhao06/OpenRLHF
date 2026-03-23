@@ -1,0 +1,46 @@
+{
+  "base_model": {
+    "model_name": "Base Model",
+    "model_path": "Qwen/Qwen3-8B",
+    "num_samples": 302,
+    "write_metrics": {
+      "accuracy": 0.45364238410596025,
+      "precision": 0.3783783783783784,
+      "recall": 0.5833333333333334,
+      "f1": 0.45901639344262296,
+      "tp": 70,
+      "fp": 115,
+      "tn": 67,
+      "fn": 50,
+      "total": 302,
+      "write_rate_pred": 0.6125827814569537,
+      "write_rate_gt": 0.3973509933774834
+    },
+    "key_similarity": {
+      "avg_key_jaccard": 0.024897959183673466,
+      "num_both_write": 70
+    }
+  },
+  "trained_model": {
+    "model_name": "Trained Model",
+    "model_path": "checkpoints/sft_demand_aware_qwen3_8b/final",
+    "num_samples": 302,
+    "write_metrics": {
+      "accuracy": 0.6026490066225165,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "tp": 0,
+      "fp": 0,
+      "tn": 182,
+      "fn": 120,
+      "total": 302,
+      "write_rate_pred": 0.0,
+      "write_rate_gt": 0.3973509933774834
+    },
+    "key_similarity": {
+      "avg_key_jaccard": 0.0,
+      "num_both_write": 0
+    }
+  }
+}

@@ -18,11 +18,9 @@ sys.path.insert(0, str(project_root))
 from memory_constructor.evaluation import Evaluator
 from memory_constructor.models.retriever import HybridRetriever
 from memory_constructor.models.agent import GPT5Agent
+from memory_constructor.utils.logging_utils import LOG_FORMAT, setup_file_logging
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
+logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 logger = logging.getLogger(__name__)
 
 
@@ -87,6 +85,9 @@ def parse_args():
 def main():
     """Main evaluation pipeline."""
     args = parse_args()
+
+    model_short = args.model_path.rstrip("/").split("/")[-1]
+    setup_file_logging(f"evaluate_{model_short}", project_root)
 
     logger.info("=" * 80)
     logger.info("Memory Constructor Evaluation")

@@ -1,0 +1,3 @@
+[submodule "interaction_env/WebShop_VanillaReactAgent_TrajectoryGeneration"]
+	path = interaction_env/WebShop_VanillaReactAgent_TrajectoryGeneration
+	url = https://github.com/JOKERjjjjjjyz/WebShop_VanillaReactAgent_TrajectoryGeneration.git

@@ -121,6 +121,9 @@ class PolicyLoss(nn.Module):
     ) -> torch.Tensor:
         if self.policy_loss_type == "ppo":
             log_ratio = log_probs - old_log_probs
+            # Clamp NaN values in log_ratio to 0.0 (ratio=1.0) to prevent training instability
+            # NaN can arise from bf16 overflow in model forward pass (attention/log_softmax)
+            log_ratio = torch.where(torch.isnan(log_ratio), torch.zeros_like(log_ratio), log_ratio)
             ratio = log_ratio.exp()
         elif self.policy_loss_type == "gspo":
             # GSPO: https://arxiv.org/pdf/2507.18071

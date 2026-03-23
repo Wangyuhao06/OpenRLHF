@@ -13,7 +13,7 @@ from dataclasses import asdict
 
 from vllm import LLM, SamplingParams
 
-from memory_constructor.data.schemas import SFTSample, CandidateSample
+from memory_constructor.data.schemas import SFTSample, MemoryItem, CandidateMemory, CandidateMemoryList
 from memory_constructor.utils.json_utils import parse_json_robust, validate_memory_item
 
 logger = logging.getLogger(__name__)
@@ -135,7 +135,7 @@ Respond in JSON format:
 
     def sample_candidates(
         self, samples: List[SFTSample]
-    ) -> List[CandidateSample]:
+    ) -> List[CandidateMemoryList]:
         """
         Generate candidates for a list of samples.
 
@@ -143,7 +143,7 @@ Respond in JSON format:
             samples: List of SFTSample objects
 
         Returns:
-            List of CandidateSample objects
+            List of CandidateMemoryList objects
         """
         logger.info(f"Generating candidates for {len(samples)} samples...")
 
@@ -172,18 +172,17 @@ Respond in JSON format:
                     max_num_keys=4,
                 )
 
-                # Create Dict[str, Any] object (scores will be filled by scorer)
-                candidate = Dict[str, Any](
+                candidate = CandidateMemory(
                     candidate_id=j,
-                    memory_item={
-                        "write": candidate_dict.get("write", False),
-                        "keys": candidate_dict.get("keys", []),
-                        "value": candidate_dict.get("value", ""),
-                        "timestamp": sample.target_memory.timestamp,
-                        "step_id": sample.step_id,
-                        "metadata": {},
-                    },
-                    hindsight_score=0.0,  # To be filled by scorer
+                    memory_item=MemoryItem(
+                        write=candidate_dict.get("write", False),
+                        keys=candidate_dict.get("keys", []),
+                        value=candidate_dict.get("value", ""),
+                        timestamp=sample.target_memory.timestamp,
+                        step_id=sample.step_id,
+                        metadata={},
+                    ),
+                    hindsight_score=0.0,
                     counterfactual_score=0.0,
                     task_success_score=0.0,
                     retrieval_usefulness=0.0,
@@ -199,23 +198,23 @@ Respond in JSON format:
                 candidates.append(candidate)
 
             # Always add no_write as a candidate
-            no_write_candidate = Dict[str, Any](
+            no_write_candidate = CandidateMemory(
                 candidate_id=len(candidates),
-                memory_item={
-                    "write": False,
-                    "keys": [],
-                    "value": "",
-                    "timestamp": sample.target_memory.timestamp,
-                    "step_id": sample.step_id,
-                    "metadata": {"type": "no_write"},
-                },
+                memory_item=MemoryItem(
+                    write=False,
+                    keys=[],
+                    value="",
+                    timestamp=sample.target_memory.timestamp,
+                    step_id=sample.step_id,
+                    metadata={"type": "no_write"},
+                ),
                 hindsight_score=0.0,
                 counterfactual_score=0.0,
                 task_success_score=0.0,
                 retrieval_usefulness=0.0,
-                compactness_score=1.0,  # Saves budget
-                redundancy_score=1.0,  # No redundancy
-                faithfulness_score=1.0,  # No hallucination risk
+                compactness_score=1.0,
+                redundancy_score=1.0,
+                faithfulness_score=1.0,
                 total_score=0.0,
                 future_retrieval_hits=0,
                 future_impact_steps=[],
@@ -223,8 +222,7 @@ Respond in JSON format:
             )
             candidates.append(no_write_candidate)
 
-            # Create CandidateSample
-            candidate_list = CandidateSample(
+            candidate_list = CandidateMemoryList(
                 sample_id=sample.sample_id,
                 trajectory_id=sample.trajectory_id,
                 step_id=sample.step_id,
@@ -234,7 +232,7 @@ Respond in JSON format:
                 budget_remaining=sample.budget_remaining,
                 episode_progress=sample.episode_progress,
                 candidates=candidates,
-                best_candidate_idx=-1,  # To be filled by scorer
+                best_candidate_idx=-1,
                 selection_method="",
                 metadata=sample.metadata,
             )

@@ -1,0 +1,16 @@
+{
+  "task_success_rate": 0.0,
+  "task_reward_mean": 0.0,
+  "task_reward_std": 0.0,
+  "memory_precision": 0.0,
+  "memory_recall": 1.0,
+  "memory_f1": 0.0,
+  "avg_memories_per_episode": 3.0,
+  "avg_memory_length": 7.066666666666666,
+  "memory_redundancy": 0.1,
+  "retrieval_precision": 0.0,
+  "retrieval_recall": 0.0,
+  "retrieval_f1": 0.0,
+  "avg_computational_cost": 0.15000000000000002,
+  "cost_efficiency": 0.0
+}

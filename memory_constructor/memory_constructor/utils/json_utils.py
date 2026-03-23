@@ -15,6 +15,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+def _fix_json_string(text: str) -> str:
+    """Fix common LLM JSON generation issues."""
+    # Fix invalid escape sequences (LLMs generate \$ \| \- etc.)
+    text = re.sub(r'\\([^"\\\/bfnrtu])', r'\1', text)
+    # Fix unescaped newlines inside strings: find string content and escape newlines
+    # This is a simplified approach - replace literal newlines within JSON string values
+    text = re.sub(r'(?<=": ")([^"]*)\n([^"]*")', lambda m: m.group(0).replace('\n', '\\n'), text)
+    return text
+
+
 def parse_json_robust(text: str, fallback: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """
     Robustly parse JSON from text with fallback.
@@ -28,6 +38,13 @@ def parse_json_robust(text: str, fallback: Optional[Dict[str, Any]] = None) -> D
     """
     if fallback is None:
         fallback = {"write": False, "keys": [], "value": ""}
+
+    # Strip Qwen3 <think>...</think> blocks (model outputs thinking before JSON)
+    text = re.sub(r'<think>.*?</think>', '', text, flags=re.DOTALL).strip()
+    # Also strip incomplete thinking blocks (model may still be thinking at end)
+    text = re.sub(r'<think>.*$', '', text, flags=re.DOTALL).strip()
+    # Strip bare </think> tag (when prompt already included <think>\n</think>)
+    text = re.sub(r'</think>', '', text).strip()
 
     # Try direct parsing
     try:
@@ -44,7 +61,46 @@ def parse_json_robust(text: str, fallback: Optional[Dict[str, Any]] = None) -> D
         except json.JSONDecodeError:
             pass
 
-    # Try to find JSON object in text
+    # Try to extract JSON object by brace counting (handles nested braces in values)
+    start = text.find('{')
+    if start != -1:
+        depth = 0
+        in_string = False
+        escape = False
+        for i in range(start, len(text)):
+            c = text[i]
+            if escape:
+                escape = False
+                continue
+            if c == '\\' and in_string:
+                escape = True
+                continue
+            if c == '"' and not escape:
+                in_string = not in_string
+                continue
+            if not in_string:
+                if c == '{':
+                    depth += 1
+                elif c == '}':
+                    depth -= 1
+                    if depth == 0:
+                        candidate = text[start:i+1]
+                        try:
+                            parsed = json.loads(candidate)
+                            if isinstance(parsed, dict):
+                                return parsed
+                        except json.JSONDecodeError:
+                            # Try fixing common LLM JSON issues
+                            fixed = _fix_json_string(candidate)
+                            try:
+                                parsed = json.loads(fixed)
+                                if isinstance(parsed, dict):
+                                    return parsed
+                            except json.JSONDecodeError:
+                                pass
+                            break
+
+    # Legacy regex fallback for simple cases
     json_pattern = r'\{[^{}]*(?:\{[^{}]*\}[^{}]*)*\}'
     matches = re.findall(json_pattern, text, re.DOTALL)
     for match in matches:

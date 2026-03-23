@@ -149,3 +149,9 @@ core
 *jianh*
 *test_scripts*
 */checkpoint/*
+*/checkpoints/*
+
+# tensorboard logs
+*/rl_runs/*
+memory_constructor/results/rl_runs
+*.0

@@ -1,27 +1,6 @@
 {
-  "num_trajectories": 2,
-  "num_train": 1,
-  "num_val": 0,
-  "num_test": 1,
-  "num_train_samples": 3,
-  "num_val_samples": 0,
-  "num_test_samples": 3,
-  "labeling_method": "heuristic",
-  "contribution_threshold": 0.3,
-  "max_value_tokens": 256,
-  "max_key_tokens": 64,
-  "max_num_keys": 4,
-  "statistics": {
-    "num_trajectories": 2,
-    "num_successful": 2,
-    "num_partial": 0,
-    "success_rate": 1.0,
-    "avg_steps": 3.0,
-    "avg_reward": 1.0,
-    "avg_tokens": 496.0,
-    "node_type_counts": {
-      "OBS_TOOL": 6,
-      "ACT_TOOL": 6
-    }
-  }
+  "train_samples": 109,
+  "val_samples": 25,
+  "test_samples": 23,
+  "source": "synthetic_test_data"
 }

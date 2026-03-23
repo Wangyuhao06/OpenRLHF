@@ -18,8 +18,14 @@ def stateless_init_process_group(master_address, master_port, rank, world_size, 
     the data-plane communication (NCCL) between external (train processes)
     and vLLM workers.
     """
+    import os
+
     from vllm.distributed.device_communicators.pynccl import PyNcclCommunicator
     from vllm.distributed.utils import StatelessProcessGroup
+
+    # Ensure NCCL works in Docker containers with small /dev/shm
+    os.environ.setdefault("NCCL_SHM_DISABLE", "1")
+    os.environ.setdefault("NCCL_P2P_DISABLE", "1")
 
     pg = StatelessProcessGroup.create(host=master_address, port=master_port, rank=rank, world_size=world_size)
     pynccl = PyNcclCommunicator(pg, device=device)

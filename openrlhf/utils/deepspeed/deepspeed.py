@@ -95,7 +95,8 @@ class DeepspeedStrategy(ABC):
             torch.cuda.set_device(local_rank)
 
         # Initializes the distributed backend which will take care of synchronizing nodes/GPUs
-        deepspeed.init_distributed(timeout=timeout)
+        # Use gloo backend when /dev/shm is too small for NCCL (common in Docker)
+        deepspeed.init_distributed(dist_backend="gloo", timeout=timeout)
 
         # mesh
         self.world_size = dist.get_world_size()
@@ -265,7 +266,7 @@ class DeepspeedStrategy(ABC):
     def get_ds_train_config(self, is_actor):
         # DS Config
         ds_config = get_train_ds_config(
-            offload=False,
+            offload=self.adam_offload,
             adam_offload=self.adam_offload,
             stage=self.stage,
             param_dtype=self.param_dtype,

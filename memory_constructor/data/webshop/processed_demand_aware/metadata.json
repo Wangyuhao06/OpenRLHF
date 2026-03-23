@@ -1,0 +1,1599 @@
+{
+  "num_trajectories": 227,
+  "num_train": 158,
+  "num_val": 34,
+  "num_test": 35,
+  "num_train_samples": 1319,
+  "num_val_samples": 256,
+  "num_test_samples": 302,
+  "labeling_method": "demand_aware",
+  "contribution_threshold": 0.3,
+  "max_value_tokens": 256,
+  "max_key_tokens": 64,
+  "max_num_keys": 4,
+  "budget_ratio": 2.0,
+  "strict": true,
+  "statistics": {
+    "num_trajectories": 227,
+    "num_successful": 227,
+    "num_partial": 0,
+    "success_rate": 1.0,
+    "avg_steps": 8.537444933920705,
+    "avg_reward": 1.0,
+    "avg_tokens": 4950.026431718062,
+    "node_type_counts": {
+      "OBS_TOOL": 2165,
+      "THOUGHT": 1938,
+      "ACT_TOOL": 1938
+    }
+  },
+  "retrieval_metrics": {
+    "total_queries": 1508,
+    "total_hits": 1179,
+    "total_misses": 329,
+    "overall_hit_rate": 0.7818302387267905,
+    "per_trajectory": [
+      {
+        "trajectory_id": "44ced861-674f-41b2-a6ae-9d9213125de2",
+        "queries": 5,
+        "hits": 4,
+        "misses": 1,
+        "hit_rate": 0.8
+      },
+      {
+        "trajectory_id": "a3a03417-d864-46ee-aaa5-003c238af905",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "c9f24b64-8621-4604-a5df-36177839c80f",
+        "queries": 1,
+        "hits": 1,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "784fd5b8-ec8b-4954-bdc5-c1284e8482ba",
+        "queries": 10,
+        "hits": 10,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "7020b1c8-d158-4463-ae60-71e414a271c4",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "a1c027b4-f276-4d71-9416-a484fc13b4dc",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "3394006c-6314-44dd-9ff8-b30536dbebd9",
+        "queries": 11,
+        "hits": 9,
+        "misses": 2,
+        "hit_rate": 0.8181818181818182
+      },
+      {
+        "trajectory_id": "d1ed80d4-8987-4ecc-b313-c34e6aefd46d",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "9d9d46d8-2d26-4b00-9a6d-b31eddb9e96c",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "459b4a6c-81f6-4c66-b650-00b78d198fb5",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "ade5b844-088a-49d7-a135-de915b654c72",
+        "queries": 11,
+        "hits": 10,
+        "misses": 1,
+        "hit_rate": 0.9090909090909091
+      },
+      {
+        "trajectory_id": "05876a06-db29-47e7-b6c2-619fdd0e4363",
+        "queries": 10,
+        "hits": 10,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "7403978f-d9cc-415f-b211-3cb07709f084",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "bb9b2ae8-37cc-44e1-b4aa-d3155a19675d",
+        "queries": 1,
+        "hits": 1,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "09a8e9c8-721f-47fe-a4bf-ab4358e8b976",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "dd5c1f06-4231-4ec0-ad16-2226828aef04",
+        "queries": 15,
+        "hits": 12,
+        "misses": 3,
+        "hit_rate": 0.8
+      },
+      {
+        "trajectory_id": "88d06749-48a2-4b12-8739-4b1cb3818785",
+        "queries": 15,
+        "hits": 15,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "eeb29e41-05cd-4d45-acc0-ffa8e49d32d4",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "72f2730d-4a2c-4c49-91dc-1643e76342d9",
+        "queries": 9,
+        "hits": 8,
+        "misses": 1,
+        "hit_rate": 0.8888888888888888
+      },
+      {
+        "trajectory_id": "aa945d90-08b2-447e-86c8-c6b460171df6",
+        "queries": 13,
+        "hits": 9,
+        "misses": 4,
+        "hit_rate": 0.6923076923076923
+      },
+      {
+        "trajectory_id": "a5321243-b478-4630-bf24-85e178792208",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "12378a16-841d-474f-8148-d1c8ea432fe3",
+        "queries": 12,
+        "hits": 10,
+        "misses": 2,
+        "hit_rate": 0.8333333333333334
+      },
+      {
+        "trajectory_id": "20ebf363-9ff4-4794-b7de-4373bcb7c904",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "62e69ee3-2793-4bb4-9bee-4ebd714d9cb3",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "0dae342e-6107-4d64-91c0-924d23fcb93d",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "931f804b-e99d-43e4-9ac5-76063cb38315",
+        "queries": 22,
+        "hits": 13,
+        "misses": 9,
+        "hit_rate": 0.5909090909090909
+      },
+      {
+        "trajectory_id": "fc929f60-91a7-4ecd-a9f2-f4e9416a7dd2",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "fa8a8bf1-30f4-4c83-9ea8-c9ced7ba13cd",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "a595b254-1790-47ae-9935-1a283acee1cd",
+        "queries": 1,
+        "hits": 1,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "d79f05aa-a800-43ff-b1e8-28d56841b834",
+        "queries": 5,
+        "hits": 5,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "13debe98-c107-49e5-a937-3bf155d23e8d",
+        "queries": 37,
+        "hits": 21,
+        "misses": 16,
+        "hit_rate": 0.5675675675675675
+      },
+      {
+        "trajectory_id": "0bb0e5be-cd54-476f-ab48-027986056a4b",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "8b90cd19-231b-4cbf-9491-cec43371ac6c",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "56b53fd4-e4f3-4fb2-846f-4d935dcd5cf1",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "8a2fa0b8-7ada-4faf-9dc0-50f4037d8715",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "dc92fb9c-b966-43f2-809c-e04455541637",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "3aedee63-6a4a-4dbc-a1d3-a13eaadef2e4",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "68575052-284a-4e03-a932-f340e7ecbf1c",
+        "queries": 15,
+        "hits": 12,
+        "misses": 3,
+        "hit_rate": 0.8
+      },
+      {
+        "trajectory_id": "d8ddc4c3-40d6-4e0b-a7a3-f15cd0636ba5",
+        "queries": 1,
+        "hits": 1,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "72cdce24-87fa-4fda-9252-bd7d70fd5b01",
+        "queries": 15,
+        "hits": 9,
+        "misses": 6,
+        "hit_rate": 0.6
+      },
+      {
+        "trajectory_id": "4ce30bd6-0da6-4254-ba63-6d847e023476",
+        "queries": 16,
+        "hits": 12,
+        "misses": 4,
+        "hit_rate": 0.75
+      },
+      {
+        "trajectory_id": "378f5193-cdc2-4525-88d5-e3d3be610489",
+        "queries": 13,
+        "hits": 10,
+        "misses": 3,
+        "hit_rate": 0.7692307692307693
+      },
+      {
+        "trajectory_id": "955dfd26-2e79-4107-a3e9-cc2ea8177205",
+        "queries": 15,
+        "hits": 11,
+        "misses": 4,
+        "hit_rate": 0.7333333333333333
+      },
+      {
+        "trajectory_id": "f5a5f8c9-eac4-47a1-9dfb-61722fa95455",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "c54deaa9-0d03-4fca-9c59-ce2ece4eae2f",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "711fc7ec-43a8-4965-96ab-ca5a09e10d2c",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "c23b1a82-7124-4a62-82ef-90aff222cd18",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "d2541143-96c4-47d9-8c89-f6240a33525e",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "ab23c02a-d721-4fd9-bfa4-7dab3597f0a1",
+        "queries": 1,
+        "hits": 1,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "f3984e3e-1e54-44a4-b8fb-b8dd9ec4b10f",
+        "queries": 13,
+        "hits": 11,
+        "misses": 2,
+        "hit_rate": 0.8461538461538461
+      },
+      {
+        "trajectory_id": "e01189cf-f598-4755-b751-7bc070d5c95f",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "cbbcf3ca-72fa-4880-93f3-25a63ba6de71",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "693d5515-40bb-495f-a5dd-49aff1223a11",
+        "queries": 35,
+        "hits": 26,
+        "misses": 9,
+        "hit_rate": 0.7428571428571429
+      },
+      {
+        "trajectory_id": "449596ed-1644-49bd-ba61-9904d8747539",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "4a8f2fa2-9d47-4753-908e-3b977b769ea4",
+        "queries": 16,
+        "hits": 14,
+        "misses": 2,
+        "hit_rate": 0.875
+      },
+      {
+        "trajectory_id": "f78281e5-e520-488a-a6a2-859545f9abaa",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "31a4bcab-645c-4dd9-8c69-4d2a4c41437c",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "3362ecbe-6fb8-46ca-a27a-0bfe5cf8d34a",
+        "queries": 1,
+        "hits": 1,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "42123ec1-67cd-437d-8346-cc59e7cba4c0",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "4fc43409-304b-4dbd-af20-26460eaa356f",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "d7018dab-5328-410d-ae58-7aeed055ef3d",
+        "queries": 5,
+        "hits": 5,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "035bcf9d-d033-4a3c-8a00-4594ccda9495",
+        "queries": 16,
+        "hits": 11,
+        "misses": 5,
+        "hit_rate": 0.6875
+      },
+      {
+        "trajectory_id": "d98c5adf-bf1e-47a2-89a7-1d368c6d83d1",
+        "queries": 4,
+        "hits": 3,
+        "misses": 1,
+        "hit_rate": 0.75
+      },
+      {
+        "trajectory_id": "f8bd5f45-a0dc-429d-aa4d-bba1811866dc",
+        "queries": 1,
+        "hits": 1,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "b75c8d8b-8829-4293-9272-dadf65f4bc66",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "a1027758-d8a7-40bb-ae40-9a868a9fc108",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "d07e2bb1-ad93-4814-b4c4-488066756898",
+        "queries": 6,
+        "hits": 5,
+        "misses": 1,
+        "hit_rate": 0.8333333333333334
+      },
+      {
+        "trajectory_id": "c8775126-05bd-4477-b171-61e76c684c03",
+        "queries": 27,
+        "hits": 16,
+        "misses": 11,
+        "hit_rate": 0.5925925925925926
+      },
+      {
+        "trajectory_id": "8be10954-373d-4175-8213-bf42b26aa954",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "3f2d84f9-40c6-4533-a792-89276032abdb",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "2ad8ffbb-3fe5-41db-98b7-8aa407a44e7c",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "59ea5f66-4f50-4ee2-a0da-7593fd064fed",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "64e4a6f7-88ca-473d-a79b-c14ea7a3ff08",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "cdac3ee9-c72f-4522-a048-dd785992b666",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "e8e4f919-4667-4a57-8d75-509840a96038",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "197167d8-b065-4049-9599-5b48837a9fb1",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "c2045b71-4fc8-4f27-ba50-9cc4b0be1266",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "d4ce51ca-f7bc-4852-8041-48150fb1e8bc",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "1ccdb19b-b050-4e0f-9e8e-63ecff26fe08",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "06250721-fe86-4092-9b0d-7b4b0a8a47a9",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "a494fd0c-e934-4703-b5d5-20bb57155b16",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "a9db6ac0-aa6b-4649-a5ab-9f91581b7e78",
+        "queries": 12,
+        "hits": 10,
+        "misses": 2,
+        "hit_rate": 0.8333333333333334
+      },
+      {
+        "trajectory_id": "2b2bf7be-3e85-4138-8194-74193648ddff",
+        "queries": 28,
+        "hits": 12,
+        "misses": 16,
+        "hit_rate": 0.42857142857142855
+      },
+      {
+        "trajectory_id": "fe633af7-2124-45fd-95d5-10d5e61b03b6",
+        "queries": 1,
+        "hits": 1,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "ce6360e7-f557-471e-917b-6ad7fa510bd6",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "2891d5b6-bf6c-4713-9f28-e7592d7ff78b",
+        "queries": 13,
+        "hits": 11,
+        "misses": 2,
+        "hit_rate": 0.8461538461538461
+      },
+      {
+        "trajectory_id": "6fe2d9ae-204c-4920-8428-47e9769be571",
+        "queries": 5,
+        "hits": 5,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "a1d02fa6-ec25-4003-a3b4-2a9a1c3fc7f8",
+        "queries": 7,
+        "hits": 7,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "be739d5b-15fe-4d0c-9d5f-62ddb737f8c5",
+        "queries": 5,
+        "hits": 5,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "b76271e9-4dd5-40db-a903-24c4918b9465",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "3a94fbcc-be1d-49ac-a0a8-63c6ed2afa63",
+        "queries": 17,
+        "hits": 10,
+        "misses": 7,
+        "hit_rate": 0.5882352941176471
+      },
+      {
+        "trajectory_id": "a84ebcaf-9977-45d1-888e-9dff50c26d56",
+        "queries": 14,
+        "hits": 14,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "d7ccc810-e75b-4ecf-a846-3b6312511135",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "94bcdbf9-c632-4191-845e-68fe77aab681",
+        "queries": 31,
+        "hits": 11,
+        "misses": 20,
+        "hit_rate": 0.3548387096774194
+      },
+      {
+        "trajectory_id": "93426413-e495-4dde-ae2a-fda5ed902ef2",
+        "queries": 5,
+        "hits": 5,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "e2550a68-a258-4084-88c8-4c7f0c007d7d",
+        "queries": 12,
+        "hits": 11,
+        "misses": 1,
+        "hit_rate": 0.9166666666666666
+      },
+      {
+        "trajectory_id": "904aa96c-5e60-4fb3-af99-6f1441df2b8b",
+        "queries": 11,
+        "hits": 7,
+        "misses": 4,
+        "hit_rate": 0.6363636363636364
+      },
+      {
+        "trajectory_id": "e40189e9-083c-4a45-8861-57c73719b68c",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "9daea8cd-feee-4441-b27f-653e38dc2541",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "fe8ab320-f18c-4113-b791-8bd141d53518",
+        "queries": 14,
+        "hits": 11,
+        "misses": 3,
+        "hit_rate": 0.7857142857142857
+      },
+      {
+        "trajectory_id": "d50be8d0-5f45-444e-8231-4760ccd47154",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "3c6157f7-e583-432e-930e-1d757fe677f9",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "e6c9dede-7417-4c9a-9894-8bd775fce6d2",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "c8c2b022-556f-4522-9cf2-fd2af3fcbb67",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "bc259714-a5a9-4027-8c45-9e54b2e62fc7",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "712392a5-b09d-4a81-841a-0e63bb534964",
+        "queries": 10,
+        "hits": 5,
+        "misses": 5,
+        "hit_rate": 0.5
+      },
+      {
+        "trajectory_id": "af957ec9-2684-411e-a2bb-c447ad90ffb0",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "7411f9bc-badc-4369-bffa-854c0f5ccdca",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "6ba753dc-0d89-4559-83bd-81ee9fd57bde",
+        "queries": 32,
+        "hits": 21,
+        "misses": 11,
+        "hit_rate": 0.65625
+      },
+      {
+        "trajectory_id": "488aeb38-9a92-4a06-8c09-2c861b00e644",
+        "queries": 17,
+        "hits": 11,
+        "misses": 6,
+        "hit_rate": 0.6470588235294118
+      },
+      {
+        "trajectory_id": "c4096519-50c7-4dff-a098-05b280e54aa6",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "33ab760d-6bd6-474d-9b40-22657cee3a86",
+        "queries": 19,
+        "hits": 12,
+        "misses": 7,
+        "hit_rate": 0.631578947368421
+      },
+      {
+        "trajectory_id": "8ecea0a4-7001-4671-97e7-0245b5b79f5e",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "52c2f058-99f2-46a5-831d-a6345a5bd9fe",
+        "queries": 14,
+        "hits": 14,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "ec0b253a-5e6f-40d8-b386-7c109e100b8a",
+        "queries": 18,
+        "hits": 8,
+        "misses": 10,
+        "hit_rate": 0.4444444444444444
+      },
+      {
+        "trajectory_id": "95438715-0fc1-4648-a232-f04216a35725",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "1f391c34-7295-4324-85fb-e14d445b6d72",
+        "queries": 18,
+        "hits": 10,
+        "misses": 8,
+        "hit_rate": 0.5555555555555556
+      },
+      {
+        "trajectory_id": "4089258e-2f65-477a-959b-d60beb508631",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "a6cd2484-bef1-4aba-81f7-073eda3bdacc",
+        "queries": 18,
+        "hits": 11,
+        "misses": 7,
+        "hit_rate": 0.6111111111111112
+      },
+      {
+        "trajectory_id": "6cd5224b-1632-436f-96b5-c2d35a1aafc2",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "e96b1896-5bea-466a-b4ee-8465a51b6238",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "51d76a5f-7063-43fa-bd5a-9e63e9dd756f",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "3c8c642b-e05c-422b-9ccf-d283e1435128",
+        "queries": 1,
+        "hits": 1,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "bfe77809-4c60-4a97-8b62-c95934f68c8c",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "6937bbcc-dd10-4ada-b852-5424101f603e",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "634833d3-f074-4280-b1ec-0b0040dd3539",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "7c71843a-5119-4c85-b327-a7254a241913",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "0ad943d2-144c-4586-8a54-657fba9f4acf",
+        "queries": 1,
+        "hits": 1,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "fdff5085-9eeb-4e49-8049-6fc469df8741",
+        "queries": 8,
+        "hits": 8,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "41303d06-9f2e-44e8-a85f-b6ec5c28a0ff",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "1b46bfe5-ee9c-4e0a-8966-2449c536e7af",
+        "queries": 5,
+        "hits": 5,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "08895c89-a515-4c86-af4f-4f69cc27db9c",
+        "queries": 10,
+        "hits": 8,
+        "misses": 2,
+        "hit_rate": 0.8
+      },
+      {
+        "trajectory_id": "34f3bb13-6f2d-4758-b018-69b2372fe529",
+        "queries": 14,
+        "hits": 14,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "871d8b2e-9f8b-464f-bec4-2f9b7dc56e55",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "2c70bd3f-5a69-4423-8b8f-0aa33cfca386",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "fb9fe2c7-9312-4939-b5f9-b1de60362084",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "c85c4b57-e3fb-4b11-9ec4-080998d88595",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "38b06444-90df-4c9f-8676-f000106063e3",
+        "queries": 13,
+        "hits": 11,
+        "misses": 2,
+        "hit_rate": 0.8461538461538461
+      },
+      {
+        "trajectory_id": "b0bc98a4-3923-4305-a788-e00ed52596a8",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "d22d0de0-0c16-448e-9236-9245ff463f7e",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "d04b9da4-60af-47ff-b621-21315bd24f41",
+        "queries": 1,
+        "hits": 1,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "7a36a926-c948-47a8-ad91-7960eac1227a",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "00833846-e708-4d61-bf63-2d7a21e18316",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "c34a386b-d3c1-479e-88cb-bb1bfe402a8c",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "69e0e8f3-1fb8-49a2-9af5-cee5e1aebc04",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "4a09ee31-d818-4b97-b37a-6a309fbefba1",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "9e37c188-8b3a-4026-9e14-58289c344aa0",
+        "queries": 7,
+        "hits": 7,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "b78e0b3d-24f4-4a9e-b479-78752e20c62d",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "7a84c917-f55f-48e0-9ce2-17daedb13d89",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "b5cb15ca-0f74-4ec9-93e7-ca768d340286",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "1f4bd96d-c355-45ba-81de-5203b3cae42b",
+        "queries": 35,
+        "hits": 13,
+        "misses": 22,
+        "hit_rate": 0.37142857142857144
+      },
+      {
+        "trajectory_id": "b12b4855-7705-40d5-afcd-c4e6a00b2add",
+        "queries": 1,
+        "hits": 1,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "f2ce56b8-b073-4486-ab50-dba63a500bf4",
+        "queries": 17,
+        "hits": 17,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "0c4665a7-c817-4311-acc0-f1627d5d4a73",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "6ffa2f54-6937-4bcd-896d-bbeae7628156",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "ee5a738d-2c80-431a-836e-35662754318c",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "8fb4cc51-6b67-42a5-876c-5b0c06e5f3cd",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "10d7bc59-d1e6-4a67-a659-cf5a467cb226",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "d07cf6a5-b2e4-4c0a-9d56-56834da8adf1",
+        "queries": 14,
+        "hits": 8,
+        "misses": 6,
+        "hit_rate": 0.5714285714285714
+      },
+      {
+        "trajectory_id": "7eeaef74-c40b-4764-b6a8-421cc8b327ca",
+        "queries": 5,
+        "hits": 4,
+        "misses": 1,
+        "hit_rate": 0.8
+      },
+      {
+        "trajectory_id": "575416d9-2afa-446c-afbe-942e6325d065",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "85673853-977d-4714-92ac-84a6bac52a6f",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "0217b1a9-a601-4698-88ea-a677f25d8838",
+        "queries": 20,
+        "hits": 19,
+        "misses": 1,
+        "hit_rate": 0.95
+      },
+      {
+        "trajectory_id": "baa2c701-75c4-4b64-8c9a-3bce3e602ab9",
+        "queries": 17,
+        "hits": 12,
+        "misses": 5,
+        "hit_rate": 0.7058823529411765
+      },
+      {
+        "trajectory_id": "f2e91764-7800-4712-bbe9-400a8ee2d681",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "9b3f427d-f74b-4659-b79f-2faaa8a44f27",
+        "queries": 1,
+        "hits": 1,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "060d2dee-6211-4175-a350-338e79d184aa",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "f22c1c2f-818b-4dca-ab1c-7fd929825aeb",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "de60e321-70fa-44f9-8be6-7eed426cd091",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "fa0379fd-54c8-45bc-ba13-592344f1fe9b",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "0ac5b8d7-f1bc-4a90-ba3c-ca54745a5f4e",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "77401c46-ccba-402b-bb5b-c5d38754d50a",
+        "queries": 19,
+        "hits": 12,
+        "misses": 7,
+        "hit_rate": 0.631578947368421
+      },
+      {
+        "trajectory_id": "4b397bba-2aa0-4ee3-abe6-b2fb8664b298",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "7cef7ff4-23f0-44d0-8443-9701b50319ce",
+        "queries": 15,
+        "hits": 10,
+        "misses": 5,
+        "hit_rate": 0.6666666666666666
+      },
+      {
+        "trajectory_id": "5671fb38-2a83-4fd9-b24c-4fb38ecc61cb",
+        "queries": 6,
+        "hits": 5,
+        "misses": 1,
+        "hit_rate": 0.8333333333333334
+      },
+      {
+        "trajectory_id": "85fbcb63-8cb3-454d-b6c4-389254ce30f7",
+        "queries": 16,
+        "hits": 15,
+        "misses": 1,
+        "hit_rate": 0.9375
+      },
+      {
+        "trajectory_id": "72d2be0f-8d10-41e4-8e24-63cec315a7fb",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "a4b36373-a80e-4b6d-ad57-cbd2347ff0d2",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "d9c5fdc9-6984-49e8-b60e-ed9b204ee94c",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "10fbec51-7f8e-44fb-ad85-6e7d073a453f",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "1a3d8357-f780-4b53-8dce-f7a3e234ee49",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "8a04757b-8d56-4d3d-945e-7f6004ffef49",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "b665907d-3280-48cb-b0fc-38f53b7b436c",
+        "queries": 13,
+        "hits": 7,
+        "misses": 6,
+        "hit_rate": 0.5384615384615384
+      },
+      {
+        "trajectory_id": "94fa5c53-15ad-4e06-ae4e-aa536fe125ea",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "e55e76e3-1e77-4690-bdeb-d9cc97c4c280",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "5527c340-7b6d-413b-a56f-5d6f7f966e07",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "a995a5cb-fa1b-470a-9ee5-86646ccb84a2",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "023fdf1b-414e-4e9b-a1b1-bb4626394e8b",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "15d371cd-aa4a-4fcf-bf92-d857f57e37e3",
+        "queries": 1,
+        "hits": 1,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "0ede7e3f-293c-4ce9-8b9d-818c4ebdcc28",
+        "queries": 5,
+        "hits": 3,
+        "misses": 2,
+        "hit_rate": 0.6
+      },
+      {
+        "trajectory_id": "388c08e5-5256-42e1-8d2a-350252c887b6",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "a2ecc1fa-2bdf-4102-a3d0-e04a524af1d5",
+        "queries": 1,
+        "hits": 1,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "5cef0cf5-c638-4344-85aa-f12ef0169ae8",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "bd335767-5ad3-45ea-b726-efe9d9ca560b",
+        "queries": 17,
+        "hits": 13,
+        "misses": 4,
+        "hit_rate": 0.7647058823529411
+      },
+      {
+        "trajectory_id": "96ed3f26-d674-44c7-8e03-7047e303d4ce",
+        "queries": 28,
+        "hits": 15,
+        "misses": 13,
+        "hit_rate": 0.5357142857142857
+      },
+      {
+        "trajectory_id": "4a098984-d4c4-4057-b45d-3f0a7c8239ec",
+        "queries": 18,
+        "hits": 15,
+        "misses": 3,
+        "hit_rate": 0.8333333333333334
+      },
+      {
+        "trajectory_id": "4f44278c-f425-428a-8da0-53e5d2794a81",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "d8cf9905-d6e1-4b83-b980-cf923e46e03d",
+        "queries": 23,
+        "hits": 11,
+        "misses": 12,
+        "hit_rate": 0.4782608695652174
+      },
+      {
+        "trajectory_id": "e28e642c-0673-4f55-9ba2-5bd14fb6a214",
+        "queries": 5,
+        "hits": 3,
+        "misses": 2,
+        "hit_rate": 0.6
+      },
+      {
+        "trajectory_id": "0abd3bb4-871b-4c92-8780-a42be194ec6d",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "d05faac3-68d7-4421-8ee1-8894c9c58303",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "b13db150-e083-4bfb-b3fc-075f1e72f0a7",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "99c2ab0e-9f80-466c-a251-b71f8d91fd7f",
+        "queries": 32,
+        "hits": 18,
+        "misses": 14,
+        "hit_rate": 0.5625
+      },
+      {
+        "trajectory_id": "93d0adc4-0218-4cc0-b11a-5c32d01245c2",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "28bea0a7-bc6b-4a80-91b9-88e77022bb00",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "c42f90f7-02f7-4d59-a7a0-7dab0d2bc61f",
+        "queries": 5,
+        "hits": 5,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "31842284-30ee-49db-b668-fec451128ab6",
+        "queries": 5,
+        "hits": 5,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "bfe110a3-22d0-47f6-8f9a-367d5443a3e1",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "b95b2d3d-000e-4119-92b9-5f30de299e8b",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "ba91d88f-af34-4e4c-849f-e6b1985fb46b",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "14a133e9-2c45-457f-a3ac-62e5566580fc",
+        "queries": 8,
+        "hits": 7,
+        "misses": 1,
+        "hit_rate": 0.875
+      },
+      {
+        "trajectory_id": "94e883a7-40bd-4a23-8841-88ab6ea13014",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "c4f3c7c0-0efa-4dbb-a583-715c128eccce",
+        "queries": 7,
+        "hits": 7,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "0b221a3b-b192-4260-b97c-08982c2a80fc",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "92a0c0ad-f323-4c38-9199-36c0106c3383",
+        "queries": 6,
+        "hits": 6,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "c7264c70-8af3-4832-bd17-60c53307b72e",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "06194a8f-b65d-406f-ac30-ad58dc5e4126",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "6af3b64d-ce4f-4b3e-94f8-6464f9fe5fa9",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "69d5852c-92cf-4f1d-97cc-658abaf0b4d3",
+        "queries": 2,
+        "hits": 2,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "88b09813-53b0-4a76-97d2-9c2301e1f68d",
+        "queries": 24,
+        "hits": 14,
+        "misses": 10,
+        "hit_rate": 0.5833333333333334
+      },
+      {
+        "trajectory_id": "88359029-0875-4b02-b41d-cee471ab0a95",
+        "queries": 3,
+        "hits": 3,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "f2fec955-a9d1-4f04-a43e-46e560f7a1f5",
+        "queries": 4,
+        "hits": 4,
+        "misses": 0,
+        "hit_rate": 1.0
+      },
+      {
+        "trajectory_id": "46a33933-e386-40c2-aedd-d28b3421f47c",
+        "queries": 14,
+        "hits": 4,
+        "misses": 10,
+        "hit_rate": 0.2857142857142857
+      }
+    ]
+  }
+}

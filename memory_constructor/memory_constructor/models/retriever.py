@@ -8,6 +8,7 @@ This module implements three retrieval strategies:
 """
 
 import logging
+import os
 from typing import List, Dict, Any, Tuple, Optional
 import numpy as np
 from rank_bm25 import BM25Okapi
@@ -99,7 +100,22 @@ class DenseRetriever:
         Args:
             model_name: Sentence transformer model name
         """
-        self.model = SentenceTransformer(model_name)
+        # Use HF mirror if direct huggingface.co is unreachable
+        hf_endpoint = os.environ.get("HF_ENDPOINT")
+        if hf_endpoint:
+            os.environ.setdefault("HF_HUB_ENDPOINT", hf_endpoint)
+
+        # Try loading with network first, then fall back to local-only
+        try:
+            self.model = SentenceTransformer(model_name)
+        except Exception:
+            logger.info(
+                "Online load failed for %s, retrying with local_files_only=True",
+                model_name,
+            )
+            os.environ["HF_HUB_OFFLINE"] = "1"
+            self.model = SentenceTransformer(model_name)
+
         self.memory_items = []
         self.embeddings = None
 
@@ -115,7 +131,8 @@ class DenseRetriever:
         texts = []
         for mem in self.memory_items:
             keys_text = " ".join(mem.keys)
-            value_preview = mem.value[:100] if len(mem.value) > 100 else mem.value
+            # value_preview = mem.value[:100] if len(mem.value) > 100 else mem.value
+            value_preview = mem.value
             combined_text = f"{keys_text} {value_preview}"
             texts.append(combined_text)
 

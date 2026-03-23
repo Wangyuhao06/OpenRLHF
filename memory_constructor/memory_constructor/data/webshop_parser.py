@@ -303,16 +303,16 @@ def extract_observations_and_actions(
     for i, node in enumerate(trajectory.trajectory):
         if node.node_type == "OBS_TOOL":
             # New observation
-            current_obs = node.payload.get("raw_text", "")
+            current_obs = node.payload.get("raw_text") or node.payload.get("observation", "")
 
         elif node.node_type == "THOUGHT":
             # Thought (optional)
-            current_thought = node.payload.get("raw_text", "")
+            current_thought = node.payload.get("raw_text") or node.payload.get("thought", "")
 
         elif node.node_type == "ACT_TOOL":
             # Action - create a step
             if current_obs is not None:
-                action = node.payload.get("action_str", "")
+                action = node.payload.get("action_str") or node.payload.get("action", "")
 
                 # Check if this is the last step
                 done = (i == len(trajectory.trajectory) - 1)

@@ -1,3 +1,8 @@
+[project]
+name = "openrlhf"
+version = "0.9.3"
+dependencies = []
+
 [build-system]
 requires = [
     "packaging",

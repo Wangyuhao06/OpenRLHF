@@ -15,7 +15,7 @@ from dataclasses import asdict
 import numpy as np
 
 from memory_constructor.data.schemas import (
-    CandidateSample,
+    CandidateMemoryList,
     MemoryItem,
     WebShopTrajectory,
 )
@@ -96,7 +96,7 @@ class CandidateScorer:
         Returns:
             Counterfactual score (0-1)
         """
-        if not candidate.memory_item["write"]:
+        if not candidate.memory_item.write:
             return 0.0
 
         # Create temporary memory store with existing + candidate
@@ -109,10 +109,10 @@ class CandidateScorer:
         # Add candidate
         candidate_mem = MemoryItem(
             write=True,
-            keys=candidate.memory_item["keys"],
-            value=candidate.memory_item["value"],
-            timestamp=candidate.memory_item["timestamp"],
-            step_id=candidate.memory_item["step_id"],
+            keys=candidate.memory_item.keys,
+            value=candidate.memory_item.value,
+            timestamp=candidate.memory_item.timestamp,
+            step_id=candidate.memory_item.step_id,
             metadata={},
         )
         temp_store.append(candidate_mem)
@@ -160,10 +160,10 @@ class CandidateScorer:
         Returns:
             Compactness score (0-1)
         """
-        if not candidate.memory_item["write"]:
+        if not candidate.memory_item.write:
             return 1.0  # No write = maximum compactness
 
-        value_length = len(candidate.memory_item["value"].split())
+        value_length = len(candidate.memory_item.value.split())
         compactness = 1.0 - (value_length / max_value_tokens)
 
         return max(0.0, compactness)
@@ -181,14 +181,14 @@ class CandidateScorer:
         Returns:
             Redundancy score (0-1, higher = less redundant)
         """
-        if not candidate.memory_item["write"]:
+        if not candidate.memory_item.write:
             return 1.0  # No write = no redundancy
 
         if not existing_memories:
             return 1.0  # No existing memories = no redundancy
 
         # Simple token overlap check
-        candidate_tokens = set(candidate.memory_item["value"].lower().split())
+        candidate_tokens = set(candidate.memory_item.value.lower().split())
 
         max_overlap = 0.0
         for mem in existing_memories:
@@ -219,11 +219,11 @@ class CandidateScorer:
         Returns:
             Faithfulness score (0-1)
         """
-        if not candidate.memory_item["write"]:
+        if not candidate.memory_item.write:
             return 1.0  # No write = no hallucination risk
 
         # Simple token overlap check
-        value_tokens = set(candidate.memory_item["value"].lower().split())
+        value_tokens = set(candidate.memory_item.value.lower().split())
         obs_tokens = set(observation.lower().split())
 
         if len(value_tokens) == 0:
@@ -237,7 +237,7 @@ class CandidateScorer:
     def score_candidate(
         self,
         candidate: Dict[str, Any],
-        candidate_list: CandidateSample,
+        candidate_list: CandidateMemoryList,
         future_observations: List[str],
     ) -> Dict[str, Any]:
         """
@@ -301,9 +301,9 @@ class CandidateScorer:
 
     def score_candidate_list(
         self,
-        candidate_list: CandidateSample,
+        candidate_list: CandidateMemoryList,
         future_observations: List[str],
-    ) -> CandidateSample:
+    ) -> CandidateMemoryList:
         """
         Score all candidates in a list and select best.
 
@@ -347,7 +347,7 @@ class CandidateScorer:
         Score candidates from file and save results.
 
         Args:
-            input_path: Path to input JSONL with CandidateSample objects
+            input_path: Path to input JSONL with CandidateMemoryList objects
             output_path: Path to output JSONL for scored candidates
             trajectory_file: Optional trajectory file for hindsight scoring
             max_samples: Maximum samples to process
@@ -367,7 +367,7 @@ class CandidateScorer:
 
                 try:
                     data = json.loads(line)
-                    candidate_list = CandidateSample.from_dict(data)
+                    candidate_list = CandidateMemoryList.from_dict(data)
                     candidate_lists.append(candidate_list)
                 except Exception as e:
                     logger.warning(f"Failed to parse line {line_num}: {e}")

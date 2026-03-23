@@ -405,12 +405,23 @@ class PolicyModelActor(BaseModelActor):
 
         # Skip for vLLM >= 0.16 where NCCL_CUMEM_ENABLE=0 causes ncclCommInitRank to fail
         # with "unhandled cuda error" under NCCL 2.27+.
+        # Also skip for NCCL >= 2.27 even with vLLM < 0.16, as NCCL_CUMEM_ENABLE=0
+        # causes the same ncclCommInitRank failure.
         if getattr(args, "vllm_sync_backend", "nccl") == "nccl":
             import vllm
             from packaging import version as pkg_version
 
             if pkg_version.parse(vllm.__version__) < pkg_version.parse("0.16"):
-                os.environ["NCCL_CUMEM_ENABLE"] = "0"
+                # Check NCCL version - don't set NCCL_CUMEM_ENABLE=0 for NCCL >= 2.27
+                try:
+                    from vllm.distributed.device_communicators.pynccl_wrapper import NCCLLibrary
+
+                    nccl_lib = NCCLLibrary()
+                    nccl_version = nccl_lib.ncclGetVersion()
+                    if nccl_version < 22700:
+                        os.environ["NCCL_CUMEM_ENABLE"] = "0"
+                except Exception:
+                    pass  # Skip if can't determine NCCL version
 
         self._setup_distributed(strategy)
 

@@ -17,11 +17,9 @@ sys.path.insert(0, str(project_root))
 
 from memory_constructor.training.candidate_scorer import CandidateScorer
 from memory_constructor.models.retriever import HybridRetriever
+from memory_constructor.utils.logging_utils import LOG_FORMAT, setup_file_logging
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
+logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 logger = logging.getLogger(__name__)
 
 
@@ -107,6 +105,8 @@ def parse_args():
 def main():
     """Main candidate scoring pipeline."""
     args = parse_args()
+
+    setup_file_logging("score_candidates", project_root)
 
     logger.info("=" * 80)
     logger.info("Candidate Scoring for Best-of-N Training")

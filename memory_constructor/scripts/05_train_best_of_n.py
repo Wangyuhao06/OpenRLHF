@@ -19,13 +19,11 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM
 from torch.utils.data import DataLoader
 
-from memory_constructor.data.sft_dataset import MemoryConstructorSFTDataset
+from memory_constructor.data.sft_dataset import BestOfNDataset
 from memory_constructor.training.best_of_n_trainer import BestOfNTrainer
+from memory_constructor.utils.logging_utils import LOG_FORMAT, setup_file_logging
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
+logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 logger = logging.getLogger(__name__)
 
 
@@ -87,6 +85,9 @@ def main():
     """Main best-of-n training pipeline."""
     args = parse_args()
 
+    model_short = args.model_path.rstrip("/").split("/")[-1]
+    setup_file_logging(f"best_of_n_{model_short}", project_root)
+
     logger.info("=" * 80)
     logger.info("Best-of-N Training")
     logger.info("=" * 80)
@@ -101,15 +102,13 @@ def main():
 
     # Load datasets
     logger.info("\n[Step 2] Loading datasets...")
-    train_dataset = MemoryConstructorSFTDataset(
+    train_dataset = BestOfNDataset(
         data_path=args.train_file,
         tokenizer=tokenizer,
-        use_best_candidate=True,  # Use best-scored candidate
     )
-    val_dataset = MemoryConstructorSFTDataset(
+    val_dataset = BestOfNDataset(
         data_path=args.val_file,
         tokenizer=tokenizer,
-        use_best_candidate=True,
     )
 
     logger.info(f"Train samples: {len(train_dataset)}")
