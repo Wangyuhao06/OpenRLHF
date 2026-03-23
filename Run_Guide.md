@@ -2,6 +2,8 @@
 
 This project is intended to **run on the NUS HPC system**, not on a normal standalone server.
 
+This project's location on the NUS HPC system is `/home/svu/e1137518/OpenRLHF`.
+
 ## Execution model
 - Development can happen locally or via coding agents.
 - Final training / heavy computation should be submitted to the **HPC cluster** through **PBS Pro**.
