@@ -92,16 +92,12 @@ Local History (last 3 steps):
 Current Memory Store:
 {memory_store}
 
-Currently Retrievable (top matches for this observation):
-{retrieval_context}
-
 Budget Remaining: {budget_remaining}
 Episode Progress: {episode_progress:.1%}
 
 Decide: should you write a memory now? Consider:
 - Does this observation contain NEW information not already in memory?
 - Would this information help the agent in future steps?
-- Is this information retrievable from existing memory?
 
 Respond in JSON:
 {{
@@ -198,7 +194,6 @@ Respond in JSON:
             observation=sample.observation,
             local_history=history_text,
             memory_store=memory_text,
-            retrieval_context=self._format_retrieval_context(sample),
             budget_remaining=sample.budget_remaining,
             episode_progress=sample.episode_progress,
             max_num_keys=4,
