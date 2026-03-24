@@ -1,61 +1,103 @@
-# HPC Execution Notes
+# Hopper Run Guide
 
-This project is intended to **run on the NUS HPC system**, not on a normal standalone server.
+This project should run on Hopper compute nodes, not on the login node.
 
-This project's location on the NUS HPC system is `/home/svu/e1137518/OpenRLHF`.
+## Core workflow
 
-## Execution model
-- Development can happen locally or via coding agents.
-- Final training / heavy computation should be submitted to the **HPC cluster** through **PBS Pro**.
-- SSH login lands on a **login node**, which is only for light work:
-  - editing files
-  - preparing environments
-  - submitting jobs
-  - checking logs / job status
-- Long-running jobs must **not** be run directly on the login node.
-- Actual compute runs on allocated **compute nodes** after job submission.
+Use `PBS + Singularity + uv`.
 
-## Environment strategy
-Use **module + uv**.
+- PBS: request GPU resources and submit jobs.
+- Singularity: provide the base runtime, such as CUDA and PyTorch.
+- uv: create and use the project-specific Python environment on top of the container.
 
-### Recommended pattern
-1. Load required system modules first, such as:
-   - Python
-   - CUDA
-   - compiler toolchains if needed
-2. Then use `uv` for Python project dependency management.
+This means Singularity is not the full project environment by itself. It gives the system stack and major AI packages, while the repo's own Python dependencies should still be installed with `uv` inside the job or interactive session.
 
-Typical idea:
+## Current project
+
+Check your project with:
 
 ```bash
-module load python/3.12.3
-module load cuda12.4/toolkit/12.4.1
+hpc project
+```
+
+For this account on March 24, 2026, the available Hopper project is:
+
+```bash
+CFP04-CF-077
+```
+
+In PBS scripts, include:
+
+```bash
+#PBS -P CFP04-CF-077
+```
+
+## Interactive GPU debug
+
+Use this only for short debugging runs:
+
+```bash
+qsub -I -P CFP04-CF-077 -l select=1:ngpus=1 -l walltime=01:00:00
+```
+
+After entering the GPU node:
+
+```bash
+module load singularity
+singularity exec -e /app1/common/singularity-img/hopper/pytorch/pytorch_2.3.0_cuda_12.4_ngc_24.04.sif bash
+```
+
+Then inside the container, go to the repo and prepare the project environment:
+
+```bash
+cd /home/svu/e1137518/OpenRLHF
 uv sync
-uv run python train.py
-````
+uv run python your_script.py
+```
 
-## Notes on environments
+## Batch job pattern
 
-* The project environment lives in the shared filesystem and should be accessible from both login and compute nodes.
-* Prefer `uv sync` to reproduce the Python environment from project metadata.
-* Avoid assuming that local machine paths or locally installed system packages exist on the HPC nodes.
+Typical Hopper jobs should follow this pattern:
 
-## Job submission
+```bash
+#!/bin/bash
+#PBS -P CFP04-CF-077
+#PBS -j oe
+#PBS -k oed
+#PBS -N openrlhf_job
+#PBS -l walltime=24:00:00
+#PBS -l select=1:ngpus=1
 
-* Jobs are submitted with **PBS Pro** (`qsub`).
-* Monitor jobs with `qstat`.
-* Cancel jobs with `qdel`.
-* Use log files for stdout/stderr and monitor progress with `tail -f`.
+cd $PBS_O_WORKDIR
+module load singularity
 
-## GPU usage
+image="/app1/common/singularity-img/hopper/pytorch/pytorch_2.3.0_cuda_12.4_ngc_24.04.sif"
 
-* GPU resources are requested in the PBS job script.
-* Multi-GPU jobs are supported in principle by requesting the required number of GPUs in the resource specification.
-* The exact allowed GPU count depends on cluster policy, queue limits, and node configuration.
+singularity exec -e $image bash -lc '
+  uv sync
+  uv run python your_script.py
+'
+```
 
-## Operational assumptions for the agent
+Submit with:
 
-* Do not assume interactive long-running execution on the login node.
-* Prepare code to run as a **batch job**.
-* Keep commands reproducible and non-interactive where possible.
-* Prefer writing scripts that can be launched by PBS and whose progress is visible from log output.
+```bash
+qsub job.pbs
+```
+
+## Useful commands
+
+```bash
+hpc project
+qstat -awn1
+qstat -fx <job_id>
+qgpu_smi <job_id>
+gstat
+```
+
+## Notes
+
+- Do not run long training directly on `hopper-l-01`.
+- Hopper expects the correct `#PBS -P Project-Name` in the job script.
+- Do not set `CUDA_VISIBLE_DEVICES` manually in the program.
+- Hopper containers are under `/app1/common/singularity-img/hopper/`.
