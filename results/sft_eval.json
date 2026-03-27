@@ -1,0 +1,46 @@
+{
+  "base_model": {
+    "model_name": "Base Model",
+    "model_path": "Qwen/Qwen3-8B",
+    "num_samples": 302,
+    "write_metrics": {
+      "accuracy": 0.45364238410596025,
+      "precision": 0.3783783783783784,
+      "recall": 0.5833333333333334,
+      "f1": 0.45901639344262296,
+      "tp": 70,
+      "fp": 115,
+      "tn": 67,
+      "fn": 50,
+      "total": 302,
+      "write_rate_pred": 0.6125827814569537,
+      "write_rate_gt": 0.3973509933774834
+    },
+    "key_similarity": {
+      "avg_key_jaccard": 0.024897959183673466,
+      "num_both_write": 70
+    }
+  },
+  "trained_model": {
+    "model_name": "Trained Model",
+    "model_path": "memory_constructor/checkpoints/rl_qwen3_8b/ckpt/global_step250_hf",
+    "num_samples": 302,
+    "write_metrics": {
+      "accuracy": 0.6291390728476821,
+      "precision": 0.5666666666666667,
+      "recall": 0.2833333333333333,
+      "f1": 0.3777777777777777,
+      "tp": 34,
+      "fp": 26,
+      "tn": 156,
+      "fn": 86,
+      "total": 302,
+      "write_rate_pred": 0.1986754966887417,
+      "write_rate_gt": 0.3973509933774834
+    },
+    "key_similarity": {
+      "avg_key_jaccard": 0.22380952380952376,
+      "num_both_write": 34
+    }
+  }
+}

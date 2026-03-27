@@ -17,9 +17,13 @@ MC_ROOT="$PROJECT_ROOT/memory_constructor"
 
 # ---- NCCL fixes for small /dev/shm (Docker) ----
 export NCCL_SHM_DISABLE=1
-# NOTE: P2P (NVLink/PCIe) does NOT use /dev/shm, so leave it enabled for ZeRO-3 performance
+# P2P (NVLink/PCIe) does NOT use /dev/shm — keep enabled for ZeRO-3 performance
 # Clean stale NCCL/PSM shared memory segments
 rm -f /dev/shm/nccl-* /dev/shm/psm_* 2>/dev/null || true
+# NCCL debug: get actual error messages on deadlock
+export NCCL_DEBUG=WARN
+export NCCL_DEBUG_SUBSYS=ALL
+export TORCH_NCCL_ASYNC_ERROR_HANDLING=1
 
 # ---- CUDA memory management ----
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
@@ -148,7 +152,7 @@ ALL_GPUS=(0 1 2 3 5 6 7)
 CLEAN_GPUS=()
 for gpu in "${ALL_GPUS[@]}"; do
     mem_used=$(nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits -i $gpu 2>/dev/null)
-    if [ "$mem_used" -lt 1000 ] 2>/dev/null; then
+    if [ "$mem_used" -lt 2000 ] 2>/dev/null; then
         CLEAN_GPUS+=($gpu)
     fi
 done
@@ -156,29 +160,26 @@ done
 echo "[INFO] Clean GPUs available: ${CLEAN_GPUS[*]}"
 
 # Determine GPU layout based on available clean GPUs
-# NOTE: With --async_train, actor PG and vLLM PG are SEPARATE, so:
-#   total GPUs needed = ACTOR_GPUS + VLLM_ENGINES * VLLM_TP
-# Preferred: 5 actor GPUs + 2 vLLM engines = 7 GPUs
-# Medium:    4 actor GPUs + 1 vLLM engine  = 5 GPUs
-# Fallback:  2 actor GPUs + 1 vLLM engine  = 3 GPUs
-if [ ${#CLEAN_GPUS[@]} -ge 7 ]; then
-    ACTOR_GPUS=5
-    VLLM_ENGINES=2
-    VLLM_TP=1
-    TOTAL_NEEDED=7
-    echo "[INFO] Full layout: 5 actor GPUs + 2 vLLM engines = 7 GPUs"
-elif [ ${#CLEAN_GPUS[@]} -ge 5 ]; then
-    ACTOR_GPUS=4
+# NOTE: Using 1 actor GPU to avoid ZeRO-3 AllGather NCCL deadlocks
+# Total: 1 actor + 1 ref + 1 vLLM = 3 GPUs
+if [ ${#CLEAN_GPUS[@]} -ge 3 ]; then
+    ACTOR_GPUS=1
     VLLM_ENGINES=1
     VLLM_TP=1
-    TOTAL_NEEDED=5
-    echo "[INFO] Medium layout: 4 actor GPUs + 1 vLLM engine = 5 GPUs"
+    TOTAL_NEEDED=3
+    echo "[INFO] Layout: 1 actor + 1 ref + 1 vLLM = 3 GPUs (single-GPU training)"
 elif [ ${#CLEAN_GPUS[@]} -ge 3 ]; then
     ACTOR_GPUS=2
     VLLM_ENGINES=1
     VLLM_TP=1
+    TOTAL_NEEDED=5
+    echo "[INFO] Layout: $ACTOR_GPUS actor + $ACTOR_GPUS ref + 1 vLLM = $TOTAL_NEEDED GPUs"
+elif [ ${#CLEAN_GPUS[@]} -ge 3 ]; then
+    ACTOR_GPUS=1
+    VLLM_ENGINES=1
+    VLLM_TP=1
     TOTAL_NEEDED=3
-    echo "[INFO] Reduced layout: 2 actor GPUs + 1 vLLM engine = 3 GPUs"
+    echo "[INFO] Reduced layout: 1 actor + 1 ref + 1 vLLM = 3 GPUs"
 else
     echo "[ERROR] Need at least 3 clean GPUs. Only found: ${CLEAN_GPUS[*]}"
     echo "[HINT] If GPUs have leaked memory from killed processes, restart the container."
@@ -206,19 +207,20 @@ if [ "$TEST_MODE" = true ]; then
     SAVE_STEPS=100
     echo "[INFO] TEST mode: $MAX_SAMPLES samples, $NUM_EPISODES episode"
 else
-    MAX_SAMPLES=500
-    # Scale batch sizes with GPU count (must be divisible by ACTOR_GPUS)
-    if [ "$ACTOR_GPUS" -ge 5 ]; then
-        ROLLOUT_BATCH=20
-        TRAIN_BATCH=20
-    elif [ "$ACTOR_GPUS" -ge 4 ]; then
+    MAX_SAMPLES=100
+    # TRAIN_BATCH = ROLLOUT_BATCH * n_samples_per_prompt to get 1 gradient step per rollout
+    # Must ensure TRAIN_BATCH % ACTOR_GPUS == 0 for DeepSpeed
+    if [ "$ACTOR_GPUS" -ge 3 ]; then
         ROLLOUT_BATCH=12
-        TRAIN_BATCH=12
-    else
+        TRAIN_BATCH=48   # 12 * 4 = 48, 48 % 3 = 0
+    elif [ "$ACTOR_GPUS" -ge 2 ]; then
         ROLLOUT_BATCH=8
-        TRAIN_BATCH=8
+        TRAIN_BATCH=32   # 8 * 4 = 32, 32 % 2 = 0
+    else
+        ROLLOUT_BATCH=4
+        TRAIN_BATCH=16   # 4 * 4 = 16, 16 % 1 = 0
     fi
-    NUM_EPISODES=3
+    NUM_EPISODES=10
     SAVE_STEPS=10
     echo "[INFO] FULL mode: $MAX_SAMPLES samples, $NUM_EPISODES episodes"
 fi

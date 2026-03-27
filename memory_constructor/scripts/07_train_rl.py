@@ -52,11 +52,13 @@ def parse_args():
     parser.add_argument("--micro_train_batch_size", type=int, default=1)
     parser.add_argument("--micro_rollout_batch_size", type=int, default=1)
     parser.add_argument("--prompt_max_len", type=int, default=2048)
-    parser.add_argument("--generate_max_len", type=int, default=8192)
+    parser.add_argument("--generate_max_len", type=int, default=2048)
     parser.add_argument("--max_samples", type=int, default=4000)
     parser.add_argument("--max_epochs", type=int, default=1)
     parser.add_argument("--num_episodes", type=int, default=3)
-    parser.add_argument("--actor_learning_rate", type=float, default=1e-7)
+    parser.add_argument("--actor_learning_rate", type=float, default=3e-8)
+    parser.add_argument("--eps_clip", type=float, default=0.1)
+    parser.add_argument("--max_norm", type=float, default=0.5)
     parser.add_argument("--repetition_penalty", type=float, default=1.2)
 
     # GPU layout
@@ -66,8 +68,8 @@ def parse_args():
     parser.add_argument("--vllm_tensor_parallel_size", type=int, default=2)
     parser.add_argument("--vllm_gpu_memory_utilization", type=float, default=0.5)
 
-    # ZeRO stage (3 needed for 8B full-param training on 32GB GPUs with long sequences)
-    parser.add_argument("--zero_stage", type=int, default=3)
+    # ZeRO stage (2 = partitioned grads+optimizer; use 2 for single-GPU to avoid unnecessary overhead)
+    parser.add_argument("--zero_stage", type=int, default=2)
 
     # Checkpointing
     parser.add_argument("--save_steps", type=int, default=20)
@@ -133,8 +135,8 @@ def main():
         "--max_samples", str(args.max_samples),
         "--max_epochs", str(args.max_epochs),
         "--num_episodes", str(args.num_episodes),
-        # Engine
-        "--async_train",
+        # Engine — synchronous mode, NO colocate to avoid all NCCL conflicts
+        # Each group (actor, ref, vLLM) gets its own GPUs
         "--actor_num_nodes", "1",
         "--actor_num_gpus_per_node", str(args.actor_num_gpus),
         "--ref_num_nodes", "1",
@@ -142,20 +144,20 @@ def main():
         "--vllm_num_engines", str(args.vllm_num_engines),
         "--vllm_tensor_parallel_size", str(args.vllm_tensor_parallel_size),
         "--vllm_gpu_memory_utilization", str(args.vllm_gpu_memory_utilization),
-        "--colocate_all_models",
-        "--deepspeed_enable_sleep",
         "--vllm_sync_backend", "nccl",
         "--enforce_eager",
-        # Training config — ZeRO-3 partitions params+grads across GPUs, enabling full-param training
+        # Training config — ZeRO-2 for single GPU (avoids AllGather deadlocks)
         "--zero_stage", str(args.zero_stage),
         "--adam_offload",
         "--gradient_checkpointing",
         "--param_dtype", "bf16",
         "--ref_reward_offload",
-        "--init_kl_coef", "0",
+        "--init_kl_coef", "0.01",
+        "--use_kl_loss",
+        "--eps_clip", str(args.eps_clip),
+        "--max_norm", str(args.max_norm),
         "--actor_learning_rate", str(args.actor_learning_rate),
-        "--no_advantage_std_norm",
-        "--train_max_tokens_per_gpu", "8192",
+        "--train_max_tokens_per_gpu", "2048",
         "--repetition_penalty", str(args.repetition_penalty),
         # Logging
         "--use_tensorboard", tensorboard_dir,

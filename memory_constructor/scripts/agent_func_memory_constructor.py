@@ -59,7 +59,7 @@ MEMORY_BUDGET = int(os.environ.get("MEMORY_BUDGET", "40"))
 # Reward hyperparameters
 RWD_NO_WRITE_PENALTY = float(os.environ.get("RWD_NO_WRITE_PENALTY", "-0.1"))
 RWD_WRITE_COST = float(os.environ.get("RWD_WRITE_COST", "-0.05"))
-RWD_FORMAT_ERROR = float(os.environ.get("RWD_FORMAT_ERROR", "-10"))
+RWD_FORMAT_ERROR = float(os.environ.get("RWD_FORMAT_ERROR", "-0.6"))
 RWD_LONG_MEMORY_COEF = float(os.environ.get("RWD_LONG_MEMORY_COEF", "-0.1"))
 RWD_LONG_MEMORY_THRESHOLD = int(os.environ.get("RWD_LONG_MEMORY_THRESHOLD", "128"))
 RWD_RETRIEVAL_HIT = float(os.environ.get("RWD_RETRIEVAL_HIT", "0.2"))
@@ -173,6 +173,7 @@ def _format_user_message(
     retrieval_context: str,
     budget_remaining: int,
     episode_progress: float,
+    max_obs_words: int = 200,
 ) -> str:
     """Format user message — matches sft_dataset.py prompt template fields exactly."""
     history_text = "\n".join(local_history) if local_history else "(No previous steps)"
@@ -181,7 +182,7 @@ def _format_user_message(
     return (
         f"Agent Task:\n{instruction}\n\n"
         f"Key Requirements:\n{task_requirements}\n\n"
-        f"Current Observation:\n{observation}\n\n"
+        f"Current Observation:\n{_truncate(observation, max_obs_words)}\n\n"
         f"Local History (last 3 steps):\n{history_text}\n\n"
         f"Current Memory Store:\n{memory_text}\n\n"
         f"Currently Retrievable (top matches for this observation):\n{retrieval_context}\n\n"
@@ -218,6 +219,13 @@ def _get_retriever():
 class AgentInstance(AgentInstanceBase):
     """Memory constructor agent instance for OpenRLHF multi-turn RL training."""
 
+    # Max total words across ALL turns — prevents OOM during backward pass.
+    # With ~1.3 tokens/word, 3000 words ≈ 4000 tokens. Keeps sequences
+    # within generate_max_len=4096 so ZeRO-3 backward doesn't deadlock.
+    MAX_TOTAL_WORDS = int(os.environ.get("MAX_TOTAL_WORDS", "1500"))
+    # Max words per observation in user message (truncated for sequence control)
+    MAX_OBS_WORDS = int(os.environ.get("MAX_OBS_WORDS", "200"))
+
     def __init__(self, *args, **kwargs):
         self.step_idx = 0
         self.max_steps = MAX_STEPS
@@ -226,12 +234,16 @@ class AgentInstance(AgentInstanceBase):
         self.task_requirements = "(Not available)"
         self.current_obs = ""  # Current WebShop observation (for retrieval queries)
         self._http_session = None
+        self._cumulative_words = 0  # Track total words across all turns
 
         # Memory state
         self.memory_store = None
         self.local_history: List[str] = []
         # Tracks retrieval counts per memory index: {memory_idx: count}
         self.retrieval_tracker: Dict[int, int] = {}
+        # Consecutive format errors — force done after too many
+        self.consecutive_format_errors = 0
+        self.MAX_CONSECUTIVE_FORMAT_ERRORS = 3
 
     async def _get_http_session(self):
         if self._http_session is None or self._http_session.closed:
@@ -289,6 +301,7 @@ class AgentInstance(AgentInstanceBase):
             retrieval_context="(Nothing retrievable yet)",
             budget_remaining=MEMORY_BUDGET,
             episode_progress=0.0,
+            max_obs_words=self.MAX_OBS_WORDS,
         )
 
         initial_prompt = (
@@ -296,6 +309,8 @@ class AgentInstance(AgentInstanceBase):
             f"<|im_start|>user\n{user_msg}<|im_end|>\n"
             f"<|im_start|>assistant\n<think>\n</think>\n"
         )
+
+        self._cumulative_words = len(initial_prompt.split())
 
         return {"observation": initial_prompt}
 
@@ -319,6 +334,33 @@ class AgentInstance(AgentInstanceBase):
             if clean_text and not clean_text.startswith("{"):
                 format_valid = False
                 step_reward += RWD_FORMAT_ERROR
+                self.consecutive_format_errors += 1
+            else:
+                self.consecutive_format_errors = 0
+        else:
+            self.consecutive_format_errors = 0
+
+        # Early termination on too many consecutive format errors
+        if self.consecutive_format_errors >= self.MAX_CONSECUTIVE_FORMAT_ERRORS:
+            logger.warning(f"Forcing done: {self.consecutive_format_errors} consecutive format errors")
+            total_reward = step_reward + self._compute_episode_rewards(
+                webshop_reward=0.0, is_success=False)
+            environment_feedback = f"<|im_end|>\n<|im_start|>user\nEpisode ended.<|im_end|>"
+            if self.session_id:
+                try:
+                    session = await self._get_http_session()
+                    async with session.post(
+                        f"{WEBSHOP_SERVER_URL}/close_session",
+                        json={"session_id": self.session_id},
+                    ) as resp:
+                        pass
+                except Exception:
+                    pass
+            return {
+                "environment_feedback": environment_feedback,
+                "rewards": torch.tensor(total_reward, dtype=torch.float),
+                "done": True,
+            }
         constructor_action = validate_memory_item(
             constructor_action,
             max_key_tokens=64,
@@ -431,6 +473,17 @@ class AgentInstance(AgentInstanceBase):
         if self.step_idx >= self.max_steps:
             done = True
 
+        # Force done if cumulative sequence length would exceed limit
+        if not done:
+            # Estimate words for next turn's environment_feedback
+            est_next_words = len(obs.split()[:self.MAX_OBS_WORDS]) + 150  # obs + boilerplate
+            if self._cumulative_words + est_next_words > self.MAX_TOTAL_WORDS:
+                logger.info(
+                    f"Forcing done: cumulative {self._cumulative_words} + next ~{est_next_words} "
+                    f"would exceed MAX_TOTAL_WORDS={self.MAX_TOTAL_WORDS}"
+                )
+                done = True
+
         # 7. Compute episode-end rewards if done
         episode_reward = 0.0
         if done:
@@ -465,11 +518,13 @@ class AgentInstance(AgentInstanceBase):
                 retrieval_context=new_retrieval_context,
                 budget_remaining=self.memory_store.get_budget_remaining(),
                 episode_progress=self.step_idx / self.max_steps,
+                max_obs_words=self.MAX_OBS_WORDS,
             )
             environment_feedback = (
                 f"<|im_end|>\n<|im_start|>user\n{user_msg}<|im_end|>\n"
                 f"<|im_start|>assistant\n<think>\n</think>\n"
             )
+            self._cumulative_words += len(environment_feedback.split())
 
         # If LLM output already contains <|im_end|>, don't prepend another one
         if "<|im_end|>" in action_text:

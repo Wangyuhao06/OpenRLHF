@@ -51,6 +51,11 @@ class BM25Retriever:
             tokenized = self.tokenizer_fn(keys_text)
             corpus.append(tokenized)
 
+        # Guard against empty corpus (no memories or all-empty keys)
+        if not corpus or all(len(doc) == 0 for doc in corpus):
+            self.bm25 = None
+            return
+
         self.bm25 = BM25Okapi(corpus)
 
     def retrieve(

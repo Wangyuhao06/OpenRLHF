@@ -207,12 +207,14 @@ class ActorPPOTrainer(ABC):
                 pbar.set_postfix(short_status)
 
         if status_list:
-            status_mean = status_list[0]
-            for m in status_list[1:]:
-                for k, v in m.items():
-                    status_mean[k] += v
-            for k in status_mean.keys():
-                status_mean[k] /= len(status_list)
+            # Collect all keys across all micro-batches (extra_logs keys may vary)
+            all_keys = set()
+            for m in status_list:
+                all_keys.update(m.keys())
+            status_mean = {}
+            for k in all_keys:
+                vals = [m[k] for m in status_list if k in m]
+                status_mean[k] = sum(vals) / len(vals)
         return status_mean
 
     def training_step(self, experience: Experience, kl_ctl: float, step: int) -> Dict[str, float]:

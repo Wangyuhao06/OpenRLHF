@@ -17,6 +17,12 @@ logger = logging.getLogger(__name__)
 
 def _fix_json_string(text: str) -> str:
     """Fix common LLM JSON generation issues."""
+    # Fix Python booleans/None → JSON (LLMs mix Python and JSON syntax)
+    text = re.sub(r'\bTrue\b', 'true', text)
+    text = re.sub(r'\bFalse\b', 'false', text)
+    text = re.sub(r'\bNone\b', 'null', text)
+    # Fix trailing ) instead of } (common LLM confusion)
+    text = re.sub(r'\)(\s*)$', r'}\1', text)
     # Fix invalid escape sequences (LLMs generate \$ \| \- etc.)
     text = re.sub(r'\\([^"\\\/bfnrtu])', r'\1', text)
     # Fix unescaped newlines inside strings: find string content and escape newlines
@@ -52,6 +58,14 @@ def parse_json_robust(text: str, fallback: Optional[Dict[str, Any]] = None) -> D
     except json.JSONDecodeError:
         pass
 
+    # Apply LLM-specific fixes (Python booleans, escape sequences, etc.)
+    fixed_text = _fix_json_string(text)
+    if fixed_text != text:
+        try:
+            return json.loads(fixed_text)
+        except json.JSONDecodeError:
+            pass
+
     # Try to extract JSON from markdown code blocks
     json_pattern = r'```(?:json)?\s*(\{.*?\})\s*```'
     matches = re.findall(json_pattern, text, re.DOTALL)
@@ -59,7 +73,11 @@ def parse_json_robust(text: str, fallback: Optional[Dict[str, Any]] = None) -> D
         try:
             return json.loads(matches[0])
         except json.JSONDecodeError:
-            pass
+            # Try with fixes applied
+            try:
+                return json.loads(_fix_json_string(matches[0]))
+            except json.JSONDecodeError:
+                pass
 
     # Try to extract JSON object by brace counting (handles nested braces in values)
     start = text.find('{')
@@ -155,7 +173,7 @@ def validate_memory_item(
     # Truncate keys
     memory_item["keys"] = memory_item["keys"][:max_num_keys]
     memory_item["keys"] = [
-        truncate_text(key, max_key_tokens) for key in memory_item["keys"]
+        truncate_text(str(key) if not isinstance(key, str) else key, max_key_tokens) for key in memory_item["keys"]
     ]
 
     # Truncate value
